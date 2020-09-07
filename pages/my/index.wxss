@@ -13,21 +13,50 @@ page,view,image,input {
 
 .userinfo {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	align-items: center;
   width: 750rpx;
 }
 .userinfo-avatar {
-	width: 160rpx;
-  height: 160rpx;
+	width: 140rpx;
+  height: 140rpx;
   margin-bottom: 10rpx;
+  margin-left: 20rpx;
   border: 1rpx solid #eee;
   border-radius: 50%;
 }
 .userinfo-nickname {
   margin-top: 20rpx;
   margin-bottom: 20rpx;
+  margin-left: 20rpx;
   font-size: 14px;
+}
+
+.user-customer {
+  display: flex;
+  margin-left: 346rpx;
+  padding-top: 30rpx;
+  padding-bottom: 20rpx;
+}
+.user-customer .item button {
+  opacity: 0;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 140rpx;
+  height: 80rpx;
+  text-align: center;
+}
+.user-customer .item .icon {
+  width: 44rpx;
+  height: 44rpx;
+  margin-left: 70rpx;
+}
+.user-customer .item .text {
+  margin-left: 68rpx;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #b31616;
 }
 
 .asset {

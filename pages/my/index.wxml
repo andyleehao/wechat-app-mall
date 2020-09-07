@@ -3,8 +3,15 @@
 <view class="container">
 	<view wx:if="{{apiUserInfoMap}}" class="userinfo">
 		<image wx:if="{{apiUserInfoMap.base.avatarUrl}}" class="userinfo-avatar" src="{{ apiUserInfoMap.base.avatarUrl }}" background-size="cover"></image>
-		<text class="userinfo-nickname">{{ apiUserInfoMap.base.nick }}</text>
-	</view>
+    <text class="userinfo-nickname">{{ apiUserInfoMap.base.nick }}</text>
+    <view class='user-customer'>
+      <view class='item'>
+        <button plain="true" open-type="contact" />
+        <image class='icon' src="/images/icon/customer.png"></image>
+        <view class='text'>客服</view>
+      </view>
+    </view>
+  </view>
   <view wx:else class="userinfo" style="margin-bottom:50rpx;">
 		<image class="userinfo-avatar" src="/images/nologin.png" background-size="cover"></image>
 		<button class="weui-btn mini-btn" plain="true" size="mini" bindtap="goLogin">立即登录</button>
@@ -190,10 +197,10 @@
   <view class="line"></view> -->
 
   <view class="space"></view>
-  <view class="menu-item" bindtap="aboutUs">
+  <!-- <view class="menu-item" bindtap="aboutUs">
     <view class="l">关于我们</view>
     <image class="next" src="/images/icon/next.png"></image>
-  </view>
+  </view> -->
   <view class="line"></view>
   <view wx:if="{{userMobile}}" class="menu-item">
     <view class="l">绑定手机</view>
