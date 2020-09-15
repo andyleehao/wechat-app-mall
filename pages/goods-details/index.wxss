@@ -167,8 +167,8 @@ swiper-item image {
   z-index: 99;
 }
 .footer-box .contact image {
-  width: 60rpx;
-  height: 60rpx;
+  width: 40rpx;
+  height: 40rpx;
 }
 .footer-box .shop-cart-btn {
   position: relative;
@@ -179,12 +179,12 @@ swiper-item image {
   margin-left: 32rpx;
 }
 .footer-box .shop-cart-btn image {
-  width: 55rpx;
-  height: 55rpx;
+  width: 40rpx;
+  height: 40rpx;
 }
 .fav-icon {
-  width: 60rpx;
-  height: 60rpx;
+  width: 40rpx;
+  height: 40rpx;
   margin-left: 32rpx;
   /*707070*/
 }
@@ -194,13 +194,13 @@ swiper-item image {
   left: 32rpx;
   top:10rpx;
 
-  width: 40rpx;
-  height: 40rpx;
-  line-height: 40rpx;
+  width: 25rpx;
+  height: 25rpx;
+  line-height: 25rpx;
   text-align: center;
   border-radius: 50%;
   background: #e64340;
-  font-size: 24rpx;
+  font-size: 16rpx;
 }
 .footer-box .join-shop-cart{
   text-align: center;
@@ -208,18 +208,18 @@ swiper-item image {
   line-height: 100rpx;
   background-color: #ff6850;
   color:#fff;
-  font-size: 34rpx;
+  font-size: 30rpx;
   flex: 1;
-  margin-left: 32rpx;
+  margin-left: 46rpx;
 }
 .footer-box .now-buy{
   text-align: center;
   height: 100%;
-  width: 250rpx;
+  width: 200rpx;
   line-height: 100rpx;
   background-color: #e64340;
   color:#fff;
-  font-size: 34rpx;
+  font-size: 30rpx;
   flex: 1;
 }
 .show-popup{

@@ -227,13 +227,13 @@
   <view wx:if="{{!curGoodsKanjia}}" class="footer-box">
     <view class="contact">
       <button type="primary" open-type="contact" />
-      <image src="/images/icon/kf.svg"></image>
+      <image src="/images/icon/contact.png"></image>
     </view>
     <view class="shop-cart-btn" bindtap="goShopCar">
       <view class="shop-num">{{shopNum}}</view>
       <image src="/images/nav/cart-off.png"></image>
     </view>
-    <image bindtap="addFav" class="fav-icon" src="/images/icon/fav{{faved?'1':'0'}}.svg"></image>
+    <image bindtap="addFav" class="fav-icon" src="/images/icon/fav{{faved?'1':'0'}}.png"></image>
     <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="{{goodsDetailSkuShowType==0?'toAddShopCar':'addShopCar'}}">加入购物车</view>
     <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="now-buy"  data-shopType="{{shopType}}" bindtap="{{goodsDetailSkuShowType==0?'tobuy':'buyNow'}}">立即购买</view>
     <view wx:if="{{goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="tobuy">单独购买</view>
