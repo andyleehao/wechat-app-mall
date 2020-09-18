@@ -17,7 +17,7 @@
     <view class="goods-profile">
       <view class="p"><text>¥</text> {{selectSizePrice}}</view>
       <view wx:if="{{goodsDetail.basicInfo.originalPrice && goodsDetail.basicInfo.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through;padding: 15rpx 0rpx 0rpx 15rpx;'><text>¥</text> {{selectSizeOPrice}}</view>
-      <view class="r">{{goodsDetail.basicInfo.numberSells}}人已买</view>
+      <view class="r">销量{{goodsDetail.basicInfo.numberSells}}件</view>
     </view>
     <view class="goods-info-fx">
       <view class='item'>
@@ -228,12 +228,17 @@
     <view class="contact">
       <button type="primary" open-type="contact" />
       <image src="/images/icon/contact.png"></image>
+      <text>客服</text>
     </view>
     <view class="shop-cart-btn" bindtap="goShopCar">
       <view class="shop-num">{{shopNum}}</view>
       <image src="/images/nav/cart-off.png"></image>
+      <text>购物车</text>
     </view>
-    <image bindtap="addFav" class="fav-icon" src="/images/icon/fav{{faved?'1':'0'}}.png"></image>
+    <view class="fav-icon-btn" bindtap="addFav">
+      <image src="/images/icon/fav{{faved?'1':'0'}}.png"></image>
+      <text>收藏</text>
+    </view>
     <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="{{goodsDetailSkuShowType==0?'toAddShopCar':'addShopCar'}}">加入购物车</view>
     <view wx:if="{{!goodsDetail.basicInfo.pingtuan}}" class="now-buy"  data-shopType="{{shopType}}" bindtap="{{goodsDetailSkuShowType==0?'tobuy':'buyNow'}}">立即购买</view>
     <view wx:if="{{goodsDetail.basicInfo.pingtuan}}" class="join-shop-cart" bindtap="tobuy">单独购买</view>
