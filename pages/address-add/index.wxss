@@ -12,7 +12,7 @@ page,view,image,input {
 .read-wx {
   padding-left: 32rpx;
   font-size: 28rpx;
-  color: #e64340;
+  color: #a61212;
 }
 .space {
   width: 100vw;
@@ -70,7 +70,7 @@ page,view,image,input {
 }
 
 .save-btn {
-  background-color: #e64340;
+  background-color: #a61212;
   color: #fff;
 }
 

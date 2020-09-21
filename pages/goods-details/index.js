@@ -725,7 +725,7 @@ Page({
             text: '￥' + _this.data.goodsDetail.basicInfo.minPrice,
             textAlign: 'center',
             fontSize: 50,
-            color: '#e64340'
+            color: '#a61212'
           },
           {
             x: 352,

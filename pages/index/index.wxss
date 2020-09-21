@@ -30,9 +30,9 @@
 
 .search {
   position: absolute;
-  top: 32rpx;
-  left: 25rpx;
-  width: 700rpx;
+  /* top: 32rpx;
+  left: 25rpx; */
+  width: 100%;
   height: 66rpx;
   display: block;
   box-sizing: border-box;
@@ -42,9 +42,9 @@
   box-sizing: border-box;
   background: rgba(255, 255, 255, 0.8);
   border: 1rpx solid #e3e3e3;
-  width: 700rpx;
+  width: 100%;
   height: 66rpx;
-  border-radius: 30rpx;
+  /* border-radius: 30rpx; */
   padding-left: 32rpx; 
 }
 .search image {
@@ -117,7 +117,7 @@
   padding-left: 16rpx;
   font-size: 24rpx;
   overflow: hidden;
-  color: #e64340;
+  color: #a61212;
 }
 .notice-box .more {
   color: #666;
@@ -158,6 +158,7 @@
 
 
 .swiper-container{
+  top: 67rpx;
   width: 750rpx;
   height: 720rpx;
   position: relative;  
@@ -176,8 +177,8 @@
   color: transparent;
 }
 .type-item-on{
-  color:#e64340;
-  border-bottom: 1rpx solid #e64340;
+  color:#a61212;
+  border-bottom: 1rpx solid #a61212;
 }
 .weui-loadmore {
   margin-bottom: 0px;
@@ -222,7 +223,7 @@
   overflow: hidden;
   font-size: 24rpx;
   padding: 24rpx 0;
-  color:#e64340;
+  color:#a61212;
   margin-left: 24rpx;
 }
 
@@ -309,7 +310,7 @@
 }
 .tuan-price .now {
   font-size:36rpx;
-  color:#e64340;
+  color:#a61212;
 }
 .tuan-price .original {
   margin-left: 20rpx;
@@ -369,7 +370,7 @@
   font-size: 28rpx;
 }
 .miaosha-goods-list .r .label {
-  color: #e64340;
+  color: #a61212;
   font-size: 24rpx;
   display: flex;
   align-items: flex-start;
@@ -379,7 +380,7 @@
   margin-left: 8rpx;
 }
 .miaosha-goods-list .count-down {
-  background: #e64340;
+  background: #a61212;
   padding: 8rpx 16rpx;
   border-radius: 16rpx;
   margin-top: 12rpx;
@@ -393,7 +394,7 @@
   align-items: center;
 }
 .miaosha-price-btn .price {
-  color: #e64340;
+  color: #a61212;
   font-size: 40rpx;
   margin-top: 12rpx;
 }

@@ -145,7 +145,8 @@ page,view,image,input {
   align-items: center;
 }
 .menu-item .l {
-  font-size:34rpx;
+  font-size:28rpx;
+  font-weight: bolder;
   color:#333;
   line-height:104rpx;
 }

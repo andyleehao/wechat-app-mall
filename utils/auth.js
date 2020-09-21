@@ -149,7 +149,7 @@ async function checkAndAuthorize (scope) {
                 content: '需要获得您的授权',
                 showCancel: false,
                 confirmText: '立即授权',
-                confirmColor: '#e64340',
+                confirmColor: '#a61212',
                 success(res) {
                   wx.openSetting();
                 },

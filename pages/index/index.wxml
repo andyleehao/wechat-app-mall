@@ -10,17 +10,19 @@
     </view>
   </view>
 </navigator>
+
+<view class="search">
+  <input type="text" placeholder="搜索商品" value="{{name}}" bindinput="bindinput" bindconfirm="bindconfirm"></input>
+  <image src="/images/icon/search.svg" bindtap="goSearch"></image>
+</view>
 <view class="swiper-container">
   <swiper class="swiper1" indicator-dots="true" indicator-active-color="#fff" autoplay circular>
     <swiper-item wx:for="{{banners}}" wx:key="id">
       <image  mode="aspectFill" bindtap="tapBanner" data-url="{{item.linkUrl}}" src="{{item.picUrl}}" />
     </swiper-item>
   </swiper>
-  <view class="search">
-    <input type="text" placeholder="搜索商品" value="{{name}}" bindinput="bindinput" bindconfirm="bindconfirm"></input>
-    <image src="/images/icon/search.svg" bindtap="goSearch"></image>
-  </view>
-  <view wx:if="{{goodsDynamic}}" class="goodsDynamic">
+
+  <!-- <view wx:if="{{goodsDynamic}}" class="goodsDynamic">
     <swiper class="swiper2" autoplay circular vertical>
       <navigator wx:for="{{goodsDynamic}}" wx:key="index" url="/pages/goods-details/index?id={{item.goodsId}}">
         <swiper-item>
@@ -31,7 +33,7 @@
         </swiper-item>
       </navigator>
     </swiper>
-  </view>
+  </view> -->
 </view>
 <view class="notice-box" wx:if="{{noticeList}}">
   <view class="notice">
@@ -135,7 +137,7 @@
             <view class="weui-media-box__desc">{{item.characteristic}}</view>
             <view class="weui-media-box__info" style='color:#333;line-height:2em;'>
               <view class="weui-media-box__info__meta">原价:{{item.originalPrice}}</view>
-              <view class="weui-media-box__info__meta" style='color:#e64340;'>底价:{{item.kanjiaPrice}}</view>
+              <view class="weui-media-box__info__meta" style='color:#a61212;'>底价:{{item.kanjiaPrice}}</view>
               <view class="weui-media-box__info__meta" style='float:right;'>
                 <button class="weui-btn mini-btn" type="warn" size="mini">砍价</button>
               </view>
@@ -143,7 +145,7 @@
           </view>
         </view>
         <view class="progress">
-          <progress percent="{{item.process}}" border-radius="8" show-info="{{false}}" font-size="20rpx" stroke-width="6" activeColor="#e64340" />
+          <progress percent="{{item.process}}" border-radius="8" show-info="{{false}}" font-size="20rpx" stroke-width="6" activeColor="#a61212" />
         </view>
       </block>
     </view>

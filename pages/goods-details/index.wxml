@@ -17,16 +17,16 @@
     <view class="goods-profile">
       <view class="p"><text>¥</text> {{selectSizePrice}}</view>
       <view wx:if="{{goodsDetail.basicInfo.originalPrice && goodsDetail.basicInfo.originalPrice > 0}}" class="goods-price" style='color:#aaa;text-decoration:line-through;padding: 15rpx 0rpx 0rpx 15rpx;'><text>¥</text> {{selectSizeOPrice}}</view>
-      <view class="r">销量{{goodsDetail.basicInfo.numberSells}}件</view>
+      <!-- <view class="r">销量{{goodsDetail.basicInfo.numberSells}}件</view> -->
     </view>
     <view class="goods-info-fx">
       <view class='item'>
-        <image src='/images/share/share1.png'></image>
+        <image src='/images/share/share.png'></image>
         <button open-type='share'></button>
       </view>
-      <view class='item' bindtap="drawSharePic">
+      <!-- <view class='item' bindtap="drawSharePic">
         <image src='/images/share/share2.png'></image>
-      </view>
+      </view> -->
     </view>    
   </view>
   <view class="page__bd" wx:if="{{curGoodsKanjia}}" style='width:750rpx;'>
@@ -181,7 +181,7 @@
     </view>
   </view>
   <view class="goods-des-info">
-    <view class="label-title">商品介绍</view>
+    <!-- <view class="label-title">商品介绍</view> -->
     <view class="goods-text">
       <parser html="{{goodsDetail.content}}" />
     </view>

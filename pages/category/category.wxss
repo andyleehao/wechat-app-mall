@@ -52,12 +52,12 @@ page,view,image,input {
 
 .category-container .category.active {
   background: #fff;
-  border-left: 4rpx solid #d81e06;
+  border-left: 4rpx solid #a61212;
 }
 
 .category-container .category .name {
   display: inline-block;
-  font-size: 28rpx;
+  font-size: 32rpx;
   color: #646464;
   line-height: 1.2;
   text-align: left;
@@ -65,7 +65,7 @@ page,view,image,input {
 }
 
 .category-container .category .name.active {
-  color: #d81e06;
+  color: #a61212;
   font-weight: bold;
 }
 
@@ -138,7 +138,7 @@ page,view,image,input {
 }
 
 .goods-container .goods .soldInfo .good-price-box .price {
-  color: #d81e06;
+  color: #a61212;
   margin-top: 10rpx;
   width: 120rpx;
   font-size: 28rpx;
@@ -159,9 +159,9 @@ page,view,image,input {
 }
 
 .goods-container .goods .soldInfo .good-sales-box .number {
-  color: #d81e06;
+  color: #a61212;
   padding: 2px;
-  border: 1px solid #d81e06;
+  border: 1px solid #a61212;
   border-radius: 5rpx;
 }
 
@@ -256,8 +256,8 @@ page,view,image,input {
   border-radius: 12rpx;
 }
 .sku-container .sku .items text.active {
-  border: 1rpx solid #e64340;
-  color: #e64340;
+  border: 1rpx solid #a61212;
+  color: #a61212;
 }
 .sku-container .num {
   display: flex;
@@ -291,7 +291,7 @@ page,view,image,input {
   width: 100vw;
   height: 90rpx;
   line-height: 90rpx;
-  background: #e64340;
+  background: #a61212;
   color: #fff;
   position: fixed;
   bottom: 0;

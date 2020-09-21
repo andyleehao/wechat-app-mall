@@ -21,8 +21,8 @@
     position: relative;
 }
 .status-box .status-label.active{
-    color:#e64340;
-    border-bottom: 6rpx solid #e64340;
+    color:#a61212;
+    border-bottom: 6rpx solid #a61212;
 }
 .no-order{
     width: 100%;
@@ -70,7 +70,7 @@
 }
 .goods-price .p {
   font-size:36rpx;
-  color:#e64340;
+  color:#a61212;
 }
 .goods-info .img-box{
     width: 120rpx;
@@ -119,10 +119,10 @@
     font-size:26rpx;
 }
 .price-box .active{
-    border:1px solid #e64340;
-    color: #e64340;
+    border:1px solid #a61212;
+    color: #a61212;
 }
 .remark {
-  color:#e64340;
+  color:#a61212;
   margin-bottom: 20rpx;
 }

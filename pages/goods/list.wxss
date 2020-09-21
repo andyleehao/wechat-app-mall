@@ -198,8 +198,8 @@ page,view,image,input {
   border-radius: 12rpx;
 }
 .sku-container .sku .items text.active {
-  border: 1rpx solid #e64340;
-  color: #e64340;
+  border: 1rpx solid #a61212;
+  color: #a61212;
 }
 .sku-container .num {
   display: flex;
@@ -233,7 +233,7 @@ page,view,image,input {
   width: 100vw;
   height: 90rpx;
   line-height: 90rpx;
-  background: #e64340;
+  background: #a61212;
   color: #fff;
   position: fixed;
   bottom: 0;

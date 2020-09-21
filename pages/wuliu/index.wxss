@@ -65,7 +65,7 @@ page{
     border-radius:100%;
 }
 .active-dot{
-    border:2rpx solid #e64340;
+    border:2rpx solid #a61212;
     width:26rpx;
     height:26rpx;
     border-radius:50%;
@@ -75,7 +75,7 @@ page{
     background-color: #fff;
 }
 .active-dot .yuan-red{
-    background:#e64340;
+    background:#a61212;
     width:14rpx;
     height:14rpx;
     border-radius:50%;

@@ -45,7 +45,7 @@
     box-sizing: border-box;
 }
 .save-btn{
-    background-color: #e64340;
+    background-color: #a61212;
     color:#fff;
 }
 button[type="default"]{

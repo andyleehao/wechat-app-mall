@@ -17,7 +17,7 @@
 
 .to-index-btn {
   color: #fff;
-  background: #e64340;
+  background: #a61212;
   border-radius: 6px;
   width: 300rpx;
   height: 70rpx;
@@ -93,6 +93,7 @@
 .goods-info .text-box .goods-title {
   width: 450rpx;
   font-size: 28rpx;
+  font-weight: bolder;
   color: #000;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -110,7 +111,7 @@
 
 .goods-info .text-box .goods-price {
   font-size: 26rpx;
-  color: #e64340;
+  color: #a61212;
 }
 
 .goods-info .text-box .buy-num {
@@ -180,7 +181,7 @@
   width: 120rpx;
   line-height: 220rpx;
   text-align: center;
-  background: #e64340;
+  background: #a61212;
   font-size: 24rpx;
   color: #fff;
 }
@@ -203,7 +204,7 @@
   width: 240rpx;
   text-align: center;
   line-height: 100rpx;
-  background-color: #e64340;
+  background-color: #a61212;
   font-size: 32rpx;
   color: #fff;
 }
@@ -222,10 +223,10 @@
   box-sizing: border-box;
 }
 .jiesuan-box .total {
-  color: #e64340;
+  color: #a61212;
 }
 .trip {
-  background: #e64340;
+  background: #a61212;
   padding: 8rpx 32rpx;
   color: #fff;
   width: 686rpx;

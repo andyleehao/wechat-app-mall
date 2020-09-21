@@ -68,5 +68,5 @@ page {
 .hasRight .import {
   margin-right: 32rpx;
   font-size:26rpx;
-  color: #e64340;
+  color: #a61212;
 }
