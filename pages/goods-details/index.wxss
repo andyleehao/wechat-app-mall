@@ -55,6 +55,7 @@ swiper-item image {
   z-index: 20;
 } 
 .goods-info-fx .item image {
+  margin-left: 120rpx;
   width: 40rpx;
   height: 40rpx;
 }

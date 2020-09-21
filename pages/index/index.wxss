@@ -129,7 +129,8 @@
   min-height: 100%;
   display: block;
 }
-.category-box {  
+.category-box { 
+  margin-top:80rpx;
   background-color: #fff;
   display: flex;
   flex-wrap: wrap;
