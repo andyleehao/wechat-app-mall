@@ -44,7 +44,7 @@
   </view>
   <view class="jiesuan-box">
     <view class="left-price">
-      <view class="total" hidden="{{noSelect}}">合计：¥ {{price}} + {{score}} 积分</view>
+      <view class="total" hidden="{{noSelect}}">合计：¥ {{price}}</view>
     </view>
     <view class="to-pay-btn">
       <navigator url="/pages/to-pay-order/index">去结算</navigator>

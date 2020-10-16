@@ -130,7 +130,7 @@
   display: block;
 }
 .category-box { 
-  margin-top:80rpx;
+  margin-top:10rpx;
   background-color: #fff;
   display: flex;
   flex-wrap: wrap;
@@ -159,7 +159,7 @@
 
 
 .swiper-container{
-  top: 67rpx;
+  top: 1rpx;
   width: 750rpx;
   height: 720rpx;
   position: relative;  
