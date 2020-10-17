@@ -25,7 +25,7 @@ Page({
     withDrawlogs: undefined,
     depositlogs: undefined,
 
-    rechargeOpen: false // 是否开启充值[预存]功能
+    rechargeOpen: true // 是否开启充值[预存]功能
   },
 
   /**

@@ -10,24 +10,42 @@
 		<button class="weui-btn mini-btn" plain="true" size="mini" bindtap="goLogin">立即登录</button>
 	</view>
   <view class="asset">
-    <view class='item' bindtap='goAsset'>
-      <view>{{balance}}</view>
-      <view>余额</view>
+    <view class='item' bindtap="goAsset">
+      <view>余额 {{balance}}</view>
+        <navigator url="/pages/recharge/index">
+          <view class='btn-view'>
+            <form bindsubmit="recharge" report-submit="true">
+              <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
+                充值
+              </button>
+            </form>
+          </view>
+      </navigator>
     </view>
-    <view class='item right' bindtap='goAsset'>
-      <view>{{freeze}}</view>
-      <view>冻结</view>
+    <view class='item right' bindtap="goAsset">
+      <view>冻结 {{freeze}}</view>
+      <navigator url="/pages/deposit/pay">
+        <view class='btn-view'>
+          <form bindsubmit="recharge" report-submit="true">
+            <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
+              押金
+            </button>
+          </form>
+        </view>
+      </navigator>
     </view>
-    <view class='item right' bindtap='goScore'>
-      <view>{{score}}</view>
-      <view>积分</view>
+    <view class='item right' bindtap="goScore">
+      <view>积分 {{score}}</view>
+      <navigator url="/pages/sign/index">
+        <view class='btn-view'>
+          <form bindsubmit="recharge" report-submit="true">
+            <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
+              签到
+            </button>
+          </form>
+        </view>
+      </navigator>
     </view>
-    <navigator url="/pages/score/growth">
-      <view class='item right'>
-        <view>{{growth}}</view>
-        <view>成长值</view>
-      </view>
-    </navigator>
   </view>
   <view class="space"></view>
   <navigator url="/pages/order-list/index">
@@ -69,20 +87,6 @@
     <view class="l">扫码核销</view>
     <image class="next" src="/images/icon/next.png"></image>
   </view>
-  <view class="line"></view>
-  <navigator url="/pages/maidan/index">
-    <view class="menu-item">
-      <view class="l">优惠买单</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
-  <view class="line"></view>
-  <navigator url="/pages/asset/index">
-    <view class="menu-item">
-      <view class="l">资金明细</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
   <view class="line"></view>
   <!-- flex布局的新菜单 -->
   <!-- <view class="menu-item">
@@ -130,21 +134,6 @@
   </navigator>
 
   <view class="space"></view>
-  <navigator url="/pages/invoice/apply">
-    <view class="menu-item">
-      <view class="l">申请发票</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
-  <view class="line"></view>
-  <navigator url="/pages/invoice/list">
-    <view class="menu-item">
-      <view class="l">发票记录</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
-
-  <view class="space"></view>
   <navigator url="/pages/select-address/index">
     <view class="menu-item">
       <view class="l">收货地址</view>
@@ -165,35 +154,9 @@
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>
-
-  <view class="space"></view>
-  <navigator url="/pages/sign/index">
-    <view class="menu-item">
-      <view class="l">每日签到</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
-  <view class="line"></view>
-  <navigator url="/pages/score-excharge/index">
-    <view class="menu-item">
-      <view class="l">积分券兑换积分</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
-  <view class="line"></view>
-  <navigator url="/pages/score-excharge/growth">
-    <view class="menu-item">
-      <view class="l">积分兑换成长值</view>
-      <image class="next" src="/images/icon/next.png"></image>
-    </view>
-  </navigator>
   <view class="line"></view>
 
   <view class="space"></view>
-  <view class="menu-item" bindtap="aboutUs">
-    <view class="l">关于我们</view>
-    <image class="next" src="/images/icon/next.png"></image>
-  </view>
   <view class="line"></view>
   <view wx:if="{{userMobile}}" class="menu-item">
     <view class="l">绑定手机</view>
@@ -217,16 +180,6 @@
     <view class="l">授权登录</view>
     <image class="next" src="/images/icon/next.png"></image>
   </view>
-
-  <!-- <view class="line"></view>
-  <view class="menu-item">
-    <view class="l">绑定官网账号</view>
-    <image class="next" src="/images/icon/next.png"></image>
-  </view> -->
-
-  <view class="space"></view>
-  <view class="version">EastWorld v {{version}}</view>
-  <view class="space"></view>
 </view>
 
 <template is="apifmLogin" data="{{wxlogin: wxlogin}}" />

@@ -13,7 +13,7 @@ Page({
     score:0,
     growth:0,
     score_sign_continuous:0,
-    rechargeOpen: false, // 是否开启充值[预存]功能
+    rechargeOpen: true, // 是否开启充值[预存]功能
 
     // 用户订单统计数据
     count_id_no_confirm: 0,
