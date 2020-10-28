@@ -19,7 +19,7 @@ Page({
 
     hasNoCoupons: true,
     coupons: [],
-    youhuijine: 0, //优惠券金额
+    youhuijine: 1, //优惠券金额
     curCoupon: null, // 当前选择使用的优惠券
     curCouponShowText: '请选择使用优惠券', // 当前选择使用的优惠券
     peisongType: 'kd', // 配送方式 kd,zq 分别表示快递/到店自取

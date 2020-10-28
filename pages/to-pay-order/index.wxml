@@ -29,9 +29,9 @@
         <label class="radio">
           <radio value="kd" checked="{{peisongType == 'kd'}}" /> 快递
         </label>
-        <label class="radio">
+        <!-- <label class="radio">
           <radio value="zq" checked="{{peisongType == 'zq'}}" /> 到店自取
-        </label>
+        </label> -->
       </radio-group>
     </view>
     <picker wx:if="{{peisongType == 'zq' && shops}}" bindchange="shopSelect" value="{{shopIndex}}" range="{{shops}}" range-key="name">
