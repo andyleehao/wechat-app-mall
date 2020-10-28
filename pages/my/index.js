@@ -1,8 +1,13 @@
-const app = getApp()
 const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
+
+const APP = getApp()
+// fixed首次打开不显示标题的bug
+APP.configLoadOK = () => {
+  
+}
 
 Page({
 	data: {
@@ -40,15 +45,11 @@ Page({
         _this.orderStatistics();
       }
     })
+    AUTH.wxaCode().then(code => {
+      this.data.code = code
+    })
     // 获取购物车数据，显示TabBarBadge
     TOOLS.showTabBarBadge();
-  },
-  aboutUs : function () {
-    wx.showModal({
-      title: '关于我们',
-      content: '本系统基于开源小程序商城系统 https://github.com/EastWorld/wechat-app-mall 搭建，祝大家使用愉快！',
-      showCancel:false
-    })
   },
   loginOut(){
     AUTH.loginOut()
@@ -65,7 +66,10 @@ Page({
       })
       return;
     }
-    WXAPI.bindMobileWxa(wx.getStorageSync('token'), e.detail.encryptedData, e.detail.iv).then(res => {
+    WXAPI.bindMobileWxapp(wx.getStorageSync('token'), this.data.code, e.detail.encryptedData, e.detail.iv).then(res => {
+      AUTH.wxaCode().then(code => {
+        this.data.code = code
+      })
       if (res.code === 10002) {
         this.setData({
           wxlogin: false
@@ -99,6 +103,10 @@ Page({
         }
         if (that.data.order_hx_uids && that.data.order_hx_uids.indexOf(res.data.base.id) != -1) {
           _data.canHX = true // 具有扫码核销的权限
+        }
+        const gooking_test = wx.getStorageSync('gooking_test')
+        if (gooking_test && gooking_test == res.data.base.id) {
+          _data.isAdmin = true
         }
         that.setData(_data);
       }
@@ -197,4 +205,11 @@ Page({
       icon: 'success'
     })
   },
+  goadmin() {
+    wx.navigateToMiniProgram({
+      appId: 'wx5e5b0066c8d3f33d',
+      path: 'pages/login/auto?token=' + wx.getStorageSync('token'),
+      envVersion: 'trial' // develop trial release
+    })
+  }
 })

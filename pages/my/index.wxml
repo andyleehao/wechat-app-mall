@@ -1,14 +1,18 @@
 <import src="/template/login/index.wxml" />
 
+<view wx:if="{{apiUserInfoMap}}" class="header-box">
+  <image class="avatar" src="{{ apiUserInfoMap.base.avatarUrl }}" mode="aspectFill"></image>
+	<view class="r">
+    <view class="uid">用户ID: {{ apiUserInfoMap.base.id }}</view>
+    <view class="nick">{{ apiUserInfoMap.base.nick }}</view>
+  </view>
+</view>
+<view wx:else class="header-box">
+  <image class="avatar" src="/images/nologin2.png"></image>
+	<van-button plain custom-class="btn" size="small" open-type="getUserInfo" lang="zh_CN" bind:getuserinfo="processLogin">立即登录</van-button>
+</view>
+
 <view class="container">
-	<view wx:if="{{apiUserInfoMap}}" class="userinfo">
-		<image wx:if="{{apiUserInfoMap.base.avatarUrl}}" class="userinfo-avatar" src="{{ apiUserInfoMap.base.avatarUrl }}" background-size="cover"></image>
-		<text class="userinfo-nickname">{{ apiUserInfoMap.base.nick }}</text>
-	</view>
-  <view wx:else class="userinfo" style="margin-bottom:50rpx;">
-		<image class="userinfo-avatar" src="/images/nologin.png" background-size="cover"></image>
-		<button class="weui-btn mini-btn" plain="true" size="mini" bindtap="goLogin">立即登录</button>
-	</view>
   <view class="asset">
     <view class='item' bindtap="goAsset">
       <view>余额 {{balance}}</view>
@@ -158,6 +162,7 @@
 
   <view class="space"></view>
   <view class="line"></view>
+
   <view wx:if="{{userMobile}}" class="menu-item">
     <view class="l">绑定手机</view>
     <view class="r">{{ userMobile }}</view>
@@ -180,6 +185,15 @@
     <view class="l">授权登录</view>
     <image class="next" src="/images/icon/next.png"></image>
   </view>
+
 </view>
+
+<van-cell title="关于我们" is-link url="/pages/about/index" />
+<van-cell title="帮助中心" is-link url="/pages/help/index" />
+<van-cell title="清除缓存" is-link bind:click="clearStorage" />
+<van-cell wx:if="{{apiUserInfoMap}}" title="退出登录" is-link bind:click="loginOut" />
+<van-cell wx:else title="立即登陆" is-link bind:click="goLogin" />
+<van-cell wx:if="{{isAdmin}}" title="管理员入口" is-link bind:click="goadmin" />
+<van-cell title="当前版本" value="{{version}}" />
 
 <template is="apifmLogin" data="{{wxlogin: wxlogin}}" />

@@ -101,14 +101,15 @@ var subDomain = '-';
 
 var request = function request(url, needSubDomain, method, data) {
   var _url = API_BASE_URL + (needSubDomain ? '/' + subDomain : '') + url;
+  var header = {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  };
   return new Promise(function (resolve, reject) {
     wx.request({
       url: _url,
       method: method,
       data: data,
-      header: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
+      header: header,
       success: function success(request) {
         resolve(request.data);
       },
@@ -125,18 +126,25 @@ var request = function request(url, needSubDomain, method, data) {
 /**
  * 小程序的promise没有finally方法，自己扩展下
  */
-Promise.prototype.finally = function (callback) {
-  var Promise = this.constructor;
-  return this.then(function (value) {
-    Promise.resolve(callback()).then(function () {
-      return value;
-    });
-  }, function (reason) {
-    Promise.resolve(callback()).then(function () {
-      throw reason;
-    });
-  });
-};
+// Promise.prototype.finally = function (callback) {
+//   var Promise = this.constructor;
+//   return this.then(
+//     function (value) {
+//       Promise.resolve(callback()).then(
+//         function () {
+//           return value;
+//         }
+//       );
+//     },
+//     function (reason) {
+//       Promise.resolve(callback()).then(
+//         function () {
+//           throw reason;
+//         }
+//       );
+//     }
+//   );
+// }
 
 module.exports = (_module$exports = {
   init2: function init2(a, b) {
@@ -281,6 +289,9 @@ module.exports = (_module$exports = {
   wxpay: function wxpay(data) {
     return request('/pay/wx/wxapp', true, 'post', data);
   },
+  wxpayFWS: function wxpayFWS(data) {
+    return request('/pay/wxfws/wxapp', true, 'post', data);
+  },
   ttpay: function ttpay(data) {
     return request('/pay/tt/microapp', true, 'post', data);
   },
@@ -343,6 +354,9 @@ module.exports = (_module$exports = {
   register_simple: function register_simple(data) {
     return request('/user/wxapp/register/simple', true, 'post', data);
   },
+  authorize: function authorize(data) {
+    return request('/user/wxapp/authorize', true, 'post', data);
+  },
   register_username: function register_username(data) {
     return request('/user/username/register', true, 'post', data);
   },
@@ -372,6 +386,14 @@ module.exports = (_module$exports = {
     return request('/shop/goods/limitation', true, 'get', {
       goodsId: goodsId, priceId: priceId
     });
+  },
+  goodsAddition: function goodsAddition(goodsId) {
+    return request('/shop/goods/goodsAddition', true, 'get', {
+      goodsId: goodsId
+    });
+  },
+  pushNewGoods: function pushNewGoods(data) {
+    return request('/shop/goods/putOrUpdate', true, 'post', data);
   },
   goodsPrice: function goodsPrice(goodsId, propertyChildIds) {
     return request('/shop/goods/price', true, 'post', {
@@ -1147,9 +1169,13 @@ module.exports = (_module$exports = {
       token: token
     });
   },
-  shippingCarInfoAddItem: function shippingCarInfoAddItem(token, goodsId, number, sku) {
+  shippingCarInfoAddItem: function shippingCarInfoAddItem(token, goodsId, number, sku, addition) {
     return request('/shopping-cart/add', true, 'post', {
-      token: token, goodsId: goodsId, number: number, sku: JSON.stringify(sku)
+      token: token,
+      goodsId: goodsId,
+      number: number,
+      sku: sku && sku.length > 0 ? JSON.stringify(sku) : '',
+      addition: addition && addition.length > 0 ? JSON.stringify(addition) : ''
     });
   },
   shippingCarInfoModifyNumber: function shippingCarInfoModifyNumber(token, key, number) {
@@ -1244,11 +1270,20 @@ module.exports = (_module$exports = {
   mtjAsset: function mtjAsset(token) {
     return request('/mtj/asset', true, 'get', { token: token });
   },
+  mtjSetting: function mtjSetting() {
+    return request('/mtj/setting', true, 'get');
+  },
   mtjLogs: function mtjLogs(data) {
     return request('/mtj/logs', true, 'post', data);
   },
   mtjStatistics: function mtjStatistics() {
     return request('/site/statistics/mjt', true, 'get');
+  },
+  mtjTransfer: function mtjTransfer(data) {
+    return request('/mtj/transfer', true, 'post', data);
+  },
+  mtjTransferLogs: function mtjTransferLogs(data) {
+    return request('/mtj/transfer/logs', true, 'post', data);
   },
   register_tt: function register_tt(data) {
     return request('/user/tt/microapp/register', true, 'post', data);
@@ -1288,6 +1323,39 @@ module.exports = (_module$exports = {
   return request('/user/attention/statistics', true, 'get', {
     token: token
   });
+}, _module$exports.cyTableToken = function cyTableToken(tableId, key) {
+  return request('/cyTable/token', true, 'post', {
+    id: tableId,
+    k: key
+  });
+}, _module$exports.cyTableAddOrder = function cyTableAddOrder(data) {
+  return request('/cyTable/add-order', true, 'post', data);
+}, _module$exports.cyTablePayOrder = function cyTablePayOrder(data) {
+  return request('/cyTable/pay-order', true, 'post', data);
+}, _module$exports.goodsTimesDays = function goodsTimesDays(goodsId) {
+  var propertyChildIds = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+  return request('/shop/goods/times/days', true, 'post', { goodsId: goodsId, propertyChildIds: propertyChildIds });
+}, _module$exports.goodsTimesDayItems = function goodsTimesDayItems(day, goodsId) {
+  var propertyChildIds = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+  return request('/shop/goods/times/items', true, 'post', { day: day, goodsId: goodsId, propertyChildIds: propertyChildIds });
+}, _module$exports.wxappServiceLogin = function wxappServiceLogin(data) {
+  return request('/user/wxappService/login', true, 'post', data);
+}, _module$exports.wxappServiceLoginWxaMobile = function wxappServiceLoginWxaMobile(data) {
+  return request('/user/wxappService/login/mobile', true, 'post', data);
+}, _module$exports.wxappServiceRegisterComplex = function wxappServiceRegisterComplex(data) {
+  return request('/user/wxappService/register/complex', true, 'post', data);
+}, _module$exports.wxappServiceRegisterSimple = function wxappServiceRegisterSimple(data) {
+  return request('/user/wxappService/register/simple', true, 'post', data);
+}, _module$exports.wxappServiceAuthorize = function wxappServiceAuthorize(data) {
+  return request('/user/wxappService/authorize', true, 'post', data);
+}, _module$exports.wxappServiceBindMobile = function wxappServiceBindMobile(data) {
+  return request('/user/wxappService/bindMobile', true, 'post', data);
+}, _module$exports.wxappServiceBindOpenid = function wxappServiceBindOpenid(data) {
+  return request('/user/wxappService/bindOpenid', true, 'post', data);
+}, _module$exports.wxappServiceEncryptedData = function wxappServiceEncryptedData(data) {
+  return request('/user/wxappService/decode/encryptedData', true, 'post', data);
 }, _module$exports);
 
 /***/ })
