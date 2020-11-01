@@ -24,7 +24,7 @@
         <image src='/images/share/share.png'></image>
         <button open-type='share'></button>
       </view>
-      <!-- <view class='item' bindtap="drawSharePic">
+      <view class='item' bindtap="drawSharePic">
         <image src='/images/share/share2.png'></image>
       </view>
     </view>
