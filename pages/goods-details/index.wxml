@@ -151,11 +151,12 @@
     </view>
   </view>
   <view wx:if="{{hasMoreSelect && goodsDetailSkuShowType==0}}" class="row-arrow" bindtap="bindGuiGeTap">
+    <view class="label-title">选择：颜色 尺码</view>
     <view>{{selectSize}}</view>
     <image src="/images/icon/next.png"></image>
   </view>
   <view class="size-label-box2" wx:if="{{goodsDetailSkuShowType==1}}">
-    <view class="label-title">选择商品规格</view>
+    <view class="label-title">选择：颜色 尺码</view>
     <view class="size-label-box">
       <block wx:for="{{goodsDetail.properties}}" wx:for-item="property" wx:for-index="idx" wx:key="id">
         <view class="label">{{property.name}}</view>

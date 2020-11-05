@@ -51,11 +51,11 @@
   box-sizing: border-box;
   padding: 6rpx;
   color: #fff;
-  font-size: 18rpx;
+  font-size: 12rpx;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #e64340;
+  background-color: #EF4847;
   border: 1rpx solid #fff;
   border-radius: 50%;
 }

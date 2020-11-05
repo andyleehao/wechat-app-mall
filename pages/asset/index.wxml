@@ -15,12 +15,13 @@
   </view>
 </view>
 <view class='btn-view'>
-  <!-- <form bindsubmit="recharge" report-submit="true">
+  <form bindsubmit="recharge" report-submit="true">
     <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
       充值
     </button>
   </form>
-  <form bindsubmit="payDeposit" report-submit="true">
+
+  <!-- <form bindsubmit="payDeposit" report-submit="true">
     <button class='btn' type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
       押金
     </button>

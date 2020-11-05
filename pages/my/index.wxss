@@ -12,65 +12,73 @@ page,view,image,input {
 }
 
 .userinfo {
+  width: 100%;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-  width: 750rpx;
 }
 .userinfo-avatar {
+  position: relative;
+  top: 10rpx;
+  left: 20rpx;
 	width: 140rpx;
   height: 140rpx;
-  margin-bottom: 10rpx;
-  margin-left: 20rpx;
+  margin-bottom: 20rpx;
   border: 1rpx solid #eee;
   border-radius: 50%;
 }
 .userinfo-nickname {
-  margin-top: 20rpx;
-  margin-bottom: 20rpx;
-  margin-left: 20rpx;
-  font-size: 14px;
+  margin-left: 40rpx;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 400;
 }
 
 .user-customer {
-  display: flex;
-  margin-left: 346rpx;
-  padding-top: 30rpx;
-  padding-bottom: 20rpx;
+  margin-left: auto;
+  width: 46px;
+  height: 24px;
+  background: #E6EAED;
+  border-radius: 100px 0px 0px 100px;
 }
 .user-customer .item button {
   opacity: 0;
   position: absolute;
   display: flex;
   flex-direction: column;
-  width: 140rpx;
-  height: 80rpx;
-  text-align: center;
+  width: 100rpx;
+  height: 100rpx;
 }
 .user-customer .item .icon {
-  width: 44rpx;
-  height: 44rpx;
-  margin-left: 70rpx;
+  width: 30rpx;
+  height: 30rpx;
+  margin-left: 10rpx;
+  margin-top: 10rpx;
 }
 .user-customer .item .text {
-  margin-left: 68rpx;
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #b31616;
+  position: absolute;
+  top: 70rpx;
+  right: 12rpx;
+  text-align: center;
+  font-size: 18rpx;
+  color: #333;
 }
 
 .asset {
+  width: 700rpx;
   display: flex;
   border-top: 1px solid #eee;
   padding-top:20rpx;
   padding-bottom:20rpx;
+  background-color: #E6EAED;
+  border-radius: 10rpx;
 }
 .asset .item {
   display: flex;
   flex-direction: column;
   width:250rpx;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 20px;
   color:#333;
 }
@@ -112,9 +120,10 @@ page,view,image,input {
   text-align: center;
 }
 .order-shortcut .item .icon {
-  width: 67rpx;
-  height: 67rpx;
-  margin-left: 45rpx;
+  width: 40rpx;
+  height: 40rpx;
+  align-content: center;
+  margin-left: 55rpx;
 }
 .order-shortcut .item .text {
   margin-top: 8rpx;
@@ -134,6 +143,14 @@ page,view,image,input {
   margin: 20rpx;
   width: 100%;
 }
+.bind-button {
+  width: 100px;
+  height: 30px;
+  font-size: 24rpx;
+  color: #072D50;
+  border-radius: 4px;
+  border: 1px solid #072D50;
+}
 /* flex重新构建菜单 */
 .menu-item {
   width: 100vw;
@@ -146,7 +163,6 @@ page,view,image,input {
 }
 .menu-item .l {
   font-size:28rpx;
-  font-weight: bolder;
   color:#333;
   line-height:104rpx;
 }

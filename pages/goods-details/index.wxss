@@ -172,6 +172,7 @@ swiper-item image {
 }
 .footer-box .contact text {
   position: absolute;
+  text-align: center;
   top: 74rpx;
   font-size: 18rpx;
   color: #313131;
@@ -190,6 +191,8 @@ swiper-item image {
 }
 .footer-box .shop-cart-btn text {
   position: absolute;
+  width: 80rpx;
+  text-align: center;
   top: 74rpx;
   font-size: 18rpx;
   color: #313131;
@@ -208,6 +211,7 @@ swiper-item image {
 }
 .footer-box .fav-icon-btn text {
   position: absolute;
+  text-align: center;
   top: 74rpx;
   font-size: 18rpx;
   color: #313131;
@@ -227,23 +231,23 @@ swiper-item image {
   background: #a61212;
   font-size: 16rpx;
 }
-.footer-box .join-shop-cart{
+.footer-box .join-shop-cart {
   text-align: center;
   height: 100%;
   line-height: 100rpx;
-  background-color: #a61212;
+  background-color: #BD9C81;
   color:#fff;
   font-size: 30rpx;
   flex: 1;
   margin-left: 66rpx;
 }
-.footer-box .now-buy{
+.footer-box .now-buy {
   text-align: center;
   height: 100%;
   width: 180rpx;
   line-height: 100rpx;
-  background-color: #fffdfd;
-  color:rgb(75, 73, 73);
+  background-color: #072D50;
+  color:#fff;
   font-size: 30rpx;
   flex: 1;
 }
@@ -384,7 +388,7 @@ swiper-item image {
   line-height: 89rpx;
   font-size:34rpx;
   color:#ffffff;
-  background-color: #a61212;
+  background-color: #072D50;
 }
 .buy-num-box .num-box .hui{
   background-color: #f5f5f9;

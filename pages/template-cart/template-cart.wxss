@@ -2,8 +2,8 @@
   justify-content: initial;
 }
 .no-goods-icon {
-  width: 100rpx;
-  height: 100rpx;
+  width: 175rpx;
+  height: 140rpx;
   margin-top: 300rpx;
 }
 .title-box {
@@ -17,7 +17,7 @@
 
 .to-index-btn {
   color: #fff;
-  background: #a61212;
+  background: #072D50;
   border-radius: 6px;
   width: 300rpx;
   height: 70rpx;
@@ -201,12 +201,17 @@
 }
 
 .jiesuan-box .to-pay-btn {
-  width: 240rpx;
+  position: absolute;
+  right: 40rpx;
+  top: 10rpx;
+  width: 200rpx;
+  height: 82rpx;
   text-align: center;
-  line-height: 100rpx;
-  background-color: #a61212;
-  font-size: 32rpx;
+  line-height: 80rpx;
+  background-color: #072D50;
+  font-size: 28rpx;
   color: #fff;
+  border-radius: 6px;
 }
 
 .jiesuan-box .to-pay-btn.no-select {
@@ -214,6 +219,7 @@
 }
 
 .jiesuan-box  .left-price {
+  font-weight: 500;
   display: flex;
   width: 510rpx;
   justify-content: space-between;
@@ -236,7 +242,7 @@
 .del-icon {
   position: absolute;
   right: 32rpx;
-  top: 32rpx;
-  width: 50rpx;
-  height: 50rpx;
+  top: 40rpx;
+  width: 35rpx;
+  height: 32rpx;
 }
