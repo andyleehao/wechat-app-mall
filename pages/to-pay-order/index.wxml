@@ -90,8 +90,9 @@
 <view class="bottom-box"></view>
 <van-submit-bar
   price="{{ allGoodsAndYunPrice*100 }}"
-  suffix-label="+{{totalScoreToPay}} 积分"
+  suffix-label=""
   button-text="提交订单"
+  button-color="#072D50"
   bind:submit="goCreateOrder"
 />
 

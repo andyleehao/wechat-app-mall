@@ -216,7 +216,7 @@ form {
   text-align: center;
   height: 100%;
   line-height: 100rpx;
-  background-color: #a61212;
+  background-color: #072D50;
   font-size: 32rpx;
   color: #fff;
   border-radius: 0;
@@ -225,7 +225,7 @@ form {
 .jiesuan-box  .left-price {
   display: flex;
   width: 500rpx;
-  justify-content: flex-end;
+  justify-content: flex-start;
   line-height: 100rpx;
   padding: 0 30rpx 0 0;
   font-size: 28rpx;

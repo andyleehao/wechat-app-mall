@@ -1,11 +1,12 @@
 <view class="container">
   <view class="search">
-    <input type="text" placeholder="输入搜索关键词" value="{{name}}" bindinput="bindinput" bindconfirm="bindconfirm"></input>
+    <input type="text" placeholder="搜索产品" value="{{name}}" bindinput="bindinput" bindconfirm="bindconfirm"></input>
     <image src="/images/icon/search.svg"></image>
   </view>
   <view class="content-container">
     <scroll-view class="category-container" scroll-y="true" scroll-with-animation="true">
       <view wx:if="{{category.level == 1}}" class="category {{categorySelected.id==category.id?'active':''}}" wx:for="{{categories}}" wx:for-item="category" wx:key="id" data-id="{{category.id}}" bindtap="onCategoryClick">
+        <image mode="aspectFit" class="image" src="{{category.icon}}"></image>
         <view class="name {{categorySelected.id==category.id?'active':''}}">{{category.name}}</view>
       </view>
     </scroll-view>
@@ -40,16 +41,17 @@
         <view class="name ellipsis" data-id='{{item.id}}' bindtap="toDetailsTap">{{item.name}}</view>
         <view class='soldInfo'>
           <view class='good-price-box'>
-            <text class="price">¥{{item.minPrice}}</text>
+            <text class="number">已售 {{item.numberSells}} 件</text>
+            <text class="price">¥ {{item.minPrice}}</text>
           </view>
         </view>
-        <view class='soldInfo'>
-          <view class='good-sales-box'>
-            <text class="number">已售 {{item.numberSells}}件</text>
-            <text>评价 +{{item.gotScore}}积分</text>
-          </view>
-        </view>
-        <image data-id="{{item.id}}" bindtap="addShopCar" class="car" src="/images/icon/car.svg"></image>
+        <!-- <view class='soldInfo'> -->
+          <!-- <view class='good-sales-box'> -->
+            <!-- <text class="number">已售 {{item.numberSells}}件</text> -->
+            <!-- <text>评价 +{{item.gotScore}}积分</text> -->
+          <!-- </view> -->
+        <!-- </view> -->
+        <!-- <image data-id="{{item.id}}" bindtap="addShopCar" class="car" src="/images/icon/car.svg"></image> -->
       </view>
     </scroll-view>
   </view>
