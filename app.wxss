@@ -51,7 +51,7 @@
   box-sizing: border-box;
   padding: 6rpx;
   color: #fff;
-  font-size: 12rpx;
+  font-size: 10rpx;
   display: flex;
   justify-content: center;
   align-items: center;

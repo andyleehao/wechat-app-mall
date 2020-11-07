@@ -109,7 +109,9 @@
     </view>
   </block>
   <!-- 秒杀结束 -->
-  <van-divider wx:if="{{goodsRecommend.length > 0 && activeCategoryId == 0}}" contentPosition="center">热卖单品</van-divider> 
+  <view class="tip-container">
+    <text class="title"> - 热卖单品 - </text>
+  </view>
   <view class="goods-container" wx:if="{{goodsRecommend.length > 0 && activeCategoryId == 0}}">
     <view class="goods-box" wx:for="{{goodsRecommend}}" wx:key="id" bindtap="toDetailsTap" data-id="{{item.id}}">
       <view class="img-box">
@@ -165,8 +167,17 @@
       </view>
     </view>
   </block>
-
-  <view class='space'></view>
+ 
+  <!-- 公司介绍 -->
+  <view class="tip-container">
+    <text class="title"> - 公司介绍 - </text>
+  </view>
+  <view class="company-intro">
+    <view class="name">
+      <text class="title">元亨服饰</text>
+    </view>
+    <text class="content">这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。</text>
+  </view>
   <!-- <view class="weui-loadmore weui-loadmore_line">
     <view class="weui-loadmore__tips weui-loadmore__tips_in-line">商品列表</view>
   </view>
@@ -182,10 +193,10 @@
       </view>
     </view>
   </view> -->
-  <view hidden="{{loadingMoreHidden ? true : false}}" class="weui-loadmore weui-loadmore_line" style='margin-top:60rpx;margin-bottom:30rpx;'>
-    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">没有更多啦</view>
+  <view hidden="{{loadingMoreHidden ? true : false}}" class="weui-loadmore weui-loadmore_line" style='margin-top:60rpx;margin-bottom:30rpx;color:#D5D5D5;font-size:14rpx'>
+    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">我是有底线的</view>
   </view>
 </view>
-<view class='coupons-float' bindtap="goCoupons">
+<!-- <view class='coupons-float' bindtap="goCoupons">
   <image src="/images/gift.png"></image>
-</view>
+</view> -->

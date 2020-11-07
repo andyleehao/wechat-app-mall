@@ -21,8 +21,8 @@
     position: relative;
 }
 .status-box .status-label.active{
-    color:#a61212;
-    border-bottom: 6rpx solid #a61212;
+    color:#072D50;
+    border-bottom: 6rpx solid #072D50;
 }
 .no-order{
     width: 100%;
@@ -119,8 +119,8 @@
     font-size:26rpx;
 }
 .price-box .active{
-    border:1px solid #a61212;
-    color: #a61212;
+    border:1px solid #072D50;
+    color: #072D50;
 }
 .remark {
   color:#a61212;

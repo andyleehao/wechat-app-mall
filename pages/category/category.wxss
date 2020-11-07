@@ -57,9 +57,11 @@ page,view,image,input {
 }
 
 .category-container .category .image {
-  margin-right: 50%;
-  width:60rpx;
+  position: relative;
+  left: 70rpx;
+  width:40rpx;
   height:80rpx;
+  pointer-events: none;
 }
 
 .category-container .category .name {
@@ -86,7 +88,7 @@ page,view,image,input {
 .goods-container .title {
   text-align: left;
   padding: 10rpx 30rpx;
-  color: #515151;
+  color: #505050;
   font-size: 22rpx;
   line-height: 30rpx;
   background: rgba(216, 30, 6, 0.3);

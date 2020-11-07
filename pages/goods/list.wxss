@@ -51,7 +51,7 @@ page,view,image,input {
   line-height: 88rpx;
 }
 .filters .active {
-  color:#fa1e26;
+  color:#A61212;
 }
 .list1 {
   margin: 16rpx;
@@ -85,7 +85,7 @@ page,view,image,input {
   word-break: break-all;
 }
 .list1 .goods-info .price {
-  color: #FF3B30;
+  color: #A61212;
   font-size: 34rpx;
 }
 .list1 .goods-info .buy-info {
@@ -131,7 +131,7 @@ page,view,image,input {
   font-size: 30rpx;
 }
 .list2 .goods-info .price {
-  color: #FF3B30;
+  color: #A61212;
   font-size: 34rpx;
 }
 .list2 .goods-info .buy-info {
