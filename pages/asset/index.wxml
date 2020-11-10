@@ -1,5 +1,4 @@
 <import src="/template/login/index.wxml" />
-
 <view class="asset">
   <view class='item'>
     <view>可用余额(元)</view>

@@ -10,10 +10,11 @@
     </view>
   </view>
 </navigator>
+<view class="tip-container">幂帛官方 - 旗舰店</view>
 <view class="swiper-container">
   <swiper class="swiper1" indicator-dots="true" indicator-active-color="#fff" autoplay circular>
     <swiper-item wx:for="{{banners}}" wx:key="id">
-      <image  mode="aspectFill" bindtap="tapBanner" data-url="{{item.linkUrl}}" src="{{item.picUrl}}" />
+      <image  mode="aspectFit" bindtap="tapBanner" data-url="{{item.linkUrl}}" src="{{item.picUrl}}" />
     </swiper-item>
   </swiper>
   <!-- <view class="search">
@@ -176,8 +177,10 @@
     <view class="name">
       <text class="title">元亨服饰</text>
     </view>
-    <text class="content">这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。这是一段简单的公司介绍，文字简洁，简单描述一下公司实力，服装品类等。公司注重产品品质，款式多样等介绍。</text>
+    <text class="content" decode="{{true}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;元亨集团成立于1995年，专注真丝、香云纱等中高端女装设计和生产，并与多家国内外知名品牌长期合作，产品出口至欧美日本等全世界多个区域。在这近30年的时间里，元亨服饰通过精湛的生产工艺，稳定的产品品质，成熟的款式设计及诚挚的服务不断获得客户信赖，在国内外市场上享有良好的口碑。目前生产的真丝类中高端女装年产值已达100多万件，高级技工400余人。高精尖数字化生产厂房占地15000平方米已投入使用。幂帛®作为元亨集团的自主品牌，同香港知名设计师合作，立足于真丝面料和中式元素，结合香云纱等名贵材质，致力于打造具有中国元素、世界品味的一流品牌。</text>
   </view>
+  <image class="company-logo" src="/images/logo.jpg"></image>
+
   <!-- <view class="weui-loadmore weui-loadmore_line">
     <view class="weui-loadmore__tips weui-loadmore__tips_in-line">商品列表</view>
   </view>
@@ -193,9 +196,7 @@
       </view>
     </view>
   </view> -->
-  <view hidden="{{loadingMoreHidden ? true : false}}" class="weui-loadmore weui-loadmore_line" style='margin-top:60rpx;margin-bottom:30rpx;color:#D5D5D5;font-size:14rpx'>
-    <view class="weui-loadmore__tips weui-loadmore__tips_in-line">我是有底线的</view>
-  </view>
+
 </view>
 <!-- <view class='coupons-float' bindtap="goCoupons">
   <image src="/images/gift.png"></image>

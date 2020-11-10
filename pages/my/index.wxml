@@ -13,9 +13,9 @@
       </view>
     </view>
   </view>
-  <view wx:else class="userinfo" style="margin-bottom:50rpx;">
+  <view wx:else class="userinfo" style="margin-bottom: 10px;margin-top:20rpx;">
 		<image class="userinfo-avatar" src="/images/nologin.png" background-size="cover"></image>
-		<button class="weui-btn mini-btn" plain="true" size="mini" bindtap="goLogin">立即登录</button>
+		<button class="weui-btn mini-btn" plain="true" size="mini" style="margin-left:60rpx;" bindtap="goLogin">立即登录</button>
 	</view>
   <view class="asset">
     <view class='item' bindtap='goAsset'>
