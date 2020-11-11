@@ -47,12 +47,18 @@ Page({
     })
   },
   tapBanner: function(e) {
-    const url = e.currentTarget.dataset.url
-    if (url) {
+    const goodsId = e.currentTarget.dataset.id // 取到参数值
+    if (goodsId) {
       wx.navigateTo({
-        url
+        url: '/pages/goods-details/index?id=' + goodsId
       })
     }
+    // const url = e.currentTarget.dataset.url
+    // if (url) {
+    //   wx.navigateTo({
+    //     url
+    //   })
+    // }
   },
   adClick: function(e) {
     const url = e.currentTarget.dataset.url

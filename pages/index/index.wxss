@@ -202,12 +202,12 @@
 }
 .goods-box .img-box{
   width: 100%;
-  height: 350rpx;
+  height: 390rpx;
   overflow: hidden;
 }
 .goods-box .img-box image{
    width: 100%;
-   height: 350rpx;
+   height: 390rpx;
 }
 .goods-box .goods-title{
   width: 280rpx;
@@ -215,7 +215,7 @@
   white-space: nowrap;
   overflow: hidden;
   font-size: 24rpx;
-  padding: 24rpx 0 0rpx 0;
+  padding: 10rpx 0 0rpx 0;
   color:#505050;
   margin-left: 24rpx;
 }
@@ -223,7 +223,7 @@
   width: 280rpx;
   overflow: hidden;
   font-size: 24rpx;
-  padding: 24rpx 0;
+  padding: 4rpx 0;
   color:#a61212;
   margin-left: 24rpx;
 }
