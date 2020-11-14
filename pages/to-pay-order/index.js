@@ -104,7 +104,7 @@ Page({
     const subscribe_ids = wx.getStorageSync('subscribe_ids')
     if (subscribe_ids) {
       wx.requestSubscribeMessage({
-        tmplIds: subscribe_ids.split(','),
+        tmplIds: ['YtUhZ3ch13skVXt4aBUuS9Des2JbvuK_6xDMjFAYAYo', 'j8mxaoJr3V0HNQqkHEdm9x7CoN2PH4SVg4mxTDI3zxQ'],
         success(res) {
           
         },

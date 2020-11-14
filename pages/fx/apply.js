@@ -45,7 +45,7 @@ Page({
   },
   bindSave(){
     wx.requestSubscribeMessage({
-      tmplIds: ['7sO58VXh0T5a6SwB5c9hR43bnBPxW8E6v3d70QQXuIk'],
+      tmplIds: ['LkxFZG9FhplmG-ikZj1f6ppgsHikn9JAxfdqP2SnUGY'],
       success(res) {
 
       },

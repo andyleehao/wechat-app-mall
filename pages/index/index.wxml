@@ -175,11 +175,17 @@
   </view>
   <view class="company-intro">
     <view class="name">
-      <text class="title">元亨服饰</text>
+      <text class="title">幂帛®</text>
     </view>
-    <text class="content" decode="{{true}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;元亨集团成立于1995年，专注真丝、香云纱等中高端女装设计和生产，并与多家国内外知名品牌长期合作，产品出口至欧美日本等全世界多个区域。在这近30年的时间里，元亨服饰通过精湛的生产工艺，稳定的产品品质，成熟的款式设计及诚挚的服务不断获得客户信赖，在国内外市场上享有良好的口碑。目前生产的真丝类中高端女装年产值已达100多万件，高级技工400余人。高精尖数字化生产厂房占地15000平方米已投入使用。幂帛®作为元亨集团的自主品牌，同香港知名设计师合作，立足于真丝面料和中式元素，结合香云纱等名贵材质，致力于打造具有中国元素、世界品味的一流品牌。</text>
+    <text class="content" decode="{{true}}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;元亨集团成立于1995年，专注真丝、香云纱等中高端女装设计和生产，并与多家国内外知名品牌长期合作，产品出口至欧美日本等全世界多个区域。在这近30年的时间里，元亨服饰通过精湛的生产工艺，稳定的产品品质，成熟的款式设计及诚挚的服务不断获得客户信赖，在国内外市场上享有良好的口碑。目前生产的真丝类中高端女装年产值已达100多万件，高级技工400余人。高精尖数字化生产厂房占地15000平方米已投入使用。
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;幂帛®作为元亨集团的自主品牌，同香港知名设计师合作，立足于真丝面料和中式元素，结合香云纱等名贵材质，致力于打造具有中国元素、世界品味的一流品牌。</text>
   </view>
-  <image class="company-logo" src="/images/logo.jpg"></image>
+  <view class="company-logo">
+    <image src="/images/logo.jpg"></image>
+    <text style="padding-top: 30rpx">关注幂帛  ｜  共同成长</text>
+    <text>中国元素  ｜  世界品味</text>
+    <text decode="{{true}}">CHINESE ELEMENTS&nbsp;&nbsp;|&nbsp;&nbsp;WORLD TASTE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</text>
+  </view>
 
   <!-- <view class="weui-loadmore weui-loadmore_line">
     <view class="weui-loadmore__tips weui-loadmore__tips_in-line">商品列表</view>

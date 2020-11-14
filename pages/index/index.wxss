@@ -416,10 +416,13 @@
   background: #FFFFFF;
   text-align: center;
   font-size: 26rpx;
+  font-weight: 600;
 }
 
 .tip-container .title {
-  font-size: 12px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   color: #A0A0A0;
   line-height: 37px;
   text-align: center;
@@ -427,7 +430,7 @@
 
 .company-intro {
   width: 100%;
-  height: 380px;
+  height: auto;
   font-size: 22px;
   font-weight: 400;
   color: #747474;
@@ -439,28 +442,39 @@
 
 .company-intro .name {
   width: 90px;
-  height: 60px;
+  height: 50px;
   background: #F1F1F1;
   text-align: center;
 }
 .company-intro .name .title {
   font-size: 15px;
   color: #505050;
-  line-height: 80px;
-  font-weight: 900;
+  line-height: 60px;
+  font-weight: 600;
 }
 
 .company-intro .content {
-  font-size: 12px;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 80rpx;
   color: #A0A0A0;
 }
 
 .company-logo {
-  position: relative;
-  top: 40rpx;
-  margin-bottom: 20rpx;
-  left: 37%;
-  right: 37%;
+  padding-top: 100rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.company-logo image {
   width: 200rpx;
   height: 200rpx;
+}
+
+.company-logo text {
+  padding-bottom: 20rpx;
+  font-size: 13px;
+  color: #A0A0A0;
 }
