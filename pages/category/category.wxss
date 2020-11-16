@@ -150,7 +150,6 @@ page,view,image,input {
 .goods-container .goods .soldInfo .good-price-box .price {
   color: #A8191A;
   margin-top: 10rpx;
-  margin-right: -20rpx;
   width: 120rpx;
   font-size: 32rpx;
   font-weight: 400;
@@ -171,7 +170,7 @@ page,view,image,input {
 .goods-container .goods .soldInfo .good-price-box .number {
   color: #999;
   margin-top: 10rpx;
-  width: 120rpx;
+  width: 250rpx;
   font-size: 20rpx;
   font-weight: 400;
   line-height: 30rpx;
