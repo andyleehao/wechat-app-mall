@@ -6,6 +6,7 @@
     <view class="uid">用户ID: {{ apiUserInfoMap.base.id }}</view>
     <view class="nick">{{ apiUserInfoMap.base.nick }}</view>
   </view>
+  <button class="charge" bindtap="goRecharge">充值</button>
 </view>
 <view wx:else class="header-box">
   <image class="avatar" src="/images/nologin2.png"></image>
@@ -14,42 +15,24 @@
 
 <view class="container">
   <view class="asset">
-    <view class='item' bindtap="goAsset">
-      <view>余额 {{balance}}</view>
-        <navigator url="/pages/recharge/index">
-          <view class='btn-view'>
-            <form bindsubmit="recharge" report-submit="true">
-              <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
-                充值
-              </button>
-            </form>
-          </view>
-      </navigator>
+    <view class='item' bindtap='goAsset'>
+      <view>{{balance}}</view>
+      <view>余额</view>
     </view>
-    <view class='item right' bindtap="goAsset">
-      <view>冻结 {{freeze}}</view>
-      <navigator url="/pages/deposit/pay">
-        <view class='btn-view'>
-          <form bindsubmit="recharge" report-submit="true">
-            <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
-              押金
-            </button>
-          </form>
-        </view>
-      </navigator>
+    <view class='item right' bindtap='goAsset'>
+      <view>{{freeze}}</view>
+      <view>冻结</view>
     </view>
-    <view class='item right' bindtap="goScore">
-      <view>积分 {{score}}</view>
-      <navigator url="/pages/sign/index">
-        <view class='btn-view'>
-          <form bindsubmit="recharge" report-submit="true">
-            <button class="btn" type="default" size="mini" form-type="submit" hover-class="btn-hover" plain="true">
-              签到
-            </button>
-          </form>
-        </view>
-      </navigator>
+    <view class='item right' bindtap='goScore'>
+      <view>{{score}}</view>
+      <view>积分</view>
     </view>
+    <!-- <navigator url="/pages/score/growth">
+      <view class='item right'>
+        <view>{{growth}}</view>
+        <view>成长值</view>
+      </view>
+    </navigator> -->
   </view>
   <view class="space"></view>
   <navigator url="/pages/order-list/index">

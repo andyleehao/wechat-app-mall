@@ -156,6 +156,11 @@ Page({
       url: "/pages/score/index"
     })
   },
+  goRecharge: function () {
+    wx.navigateTo({
+      url: '/pages/recharge/index',
+    })
+  },
   goOrder: function (e) {
     wx.navigateTo({
       url: "/pages/order-list/index?type=" + e.currentTarget.dataset.type

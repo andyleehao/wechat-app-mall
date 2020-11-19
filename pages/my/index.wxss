@@ -19,6 +19,19 @@
   color: #EEEEEE;
   font-size: 28rpx;
 }
+.header-box .charge {
+  width: 166rpx;
+  height: 60rpx;
+  box-sizing: border-box;
+  text-align: center;
+  line-height: 60rpx;
+  border: 1rpx solid #ccc;
+  border-radius: 6rpx;
+  margin-right: 20rpx;
+  font-size:26rpx;
+  background-color: #e64340;
+  color: #eee;
+}
 
 page,view,image,input {
   display: block;
