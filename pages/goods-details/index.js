@@ -232,10 +232,23 @@ Page({
       hideShopPopup: true
     })
   },
-  stepChange(event) {
-    this.setData({
-      buyNumber: event.detail
-    })
+  numJianTap: function() {
+    if (this.data.buyNumber > this.data.buyNumMin) {
+      var currentNum = this.data.buyNumber;
+      currentNum--;
+      this.setData({
+        buyNumber: currentNum
+      })
+    }
+  },
+  numJiaTap: function() {
+    if (this.data.buyNumber < this.data.buyNumMax) {
+      var currentNum = this.data.buyNumber;
+      currentNum++;
+      this.setData({
+        buyNumber: currentNum
+      })
+    }
   },
   /**
    * 选择商品规格
