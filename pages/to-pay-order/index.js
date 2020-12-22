@@ -1,4 +1,5 @@
 const app = getApp()
+const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const wxpay = require('../../utils/pay.js')
@@ -100,7 +101,19 @@ Page({
   remarkChange(e){
     this.data.remark = e.detail.value
   },
-  goCreateOrder(){
+  async goCreateOrder(){
+    // 检测实名认证状态
+    if (wx.getStorageSync('needIdCheck') == 1) {
+      console.log(123);
+      
+      const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+      if (res.code == 0 && !res.data.base.isIdcardCheck) {
+        wx.navigateTo({
+          url: '/pages/idCheck/index',
+        })
+        return
+      }
+    }
     const subscribe_ids = wx.getStorageSync('subscribe_ids')
     if (subscribe_ids) {
       wx.requestSubscribeMessage({
@@ -174,17 +187,30 @@ Page({
         })
         return;
       }
-      if(postData.peisongType == 'zq' && !this.data.mobile) {
-        wx.showToast({
-          title: '请填写手机号码',
-          icon: 'none'
-        })
-        return;
+      const extJsonStr = {}
+      if(postData.peisongType == 'zq') {
+        if(!this.data.name) {
+          wx.showToast({
+            title: '请填写联系人',
+            icon: 'none'
+          })
+          return;
+        }
+        if(!this.data.mobile) {
+          wx.showToast({
+            title: '请填写联系电话',
+            icon: 'none'
+          })
+          return;
+        }
+        extJsonStr['联系人'] = this.data.name
+        extJsonStr['联系电话'] = this.data.mobile
       }
       if(postData.peisongType == 'zq' && this.data.shops) {
         postData.shopIdZt = this.data.shops[this.data.shopIndex].id
         postData.shopNameZt = this.data.shops[this.data.shopIndex].name
       }
+      postData.extJsonStr = JSON.stringify(extJsonStr)
     }
 
     WXAPI.orderCreate(postData).then(function (res) {
@@ -242,7 +268,7 @@ Page({
     const balance = this.data.balance
     if (balance || res.data.amountReal*1 == 0) {
       // 有余额
-      const money = res.data.amountReal * 1 - balance*1
+      const money = (res.data.amountReal * 1 - balance*1).toFixed(2)
       if (money <= 0) {
         // 余额足够
         wx.showModal({

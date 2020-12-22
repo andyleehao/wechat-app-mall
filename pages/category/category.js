@@ -8,6 +8,7 @@ Page({
    */
   data: {
     categories: [],
+    activeCategory: 0,
     categorySelected: {
       name: '',
       id: ''
@@ -82,45 +83,24 @@ Page({
       currentGoods: res.data
     });
   },
-  toDetailsTap: function(e) {
-    wx.navigateTo({
-      url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
-    })
-  },
-  onCategoryClick: function(e) {
-    var that = this;
-    var id = e.target.dataset.id;
-    if (id === that.data.categorySelected.id) {
-      that.setData({
+  onCategoryClick(e) {
+    const idx = e.target.dataset.idx
+    if (idx == this.data.activeCategory) {
+      this.setData({
         scrolltop: 0,
       })
-    } else {
-      var categoryName = '';
-      for (var i = 0; i < that.data.categories.length; i++) {
-        let item = that.data.categories[i];
-        if (item.id == id) {
-          categoryName = item.name;
-          break;
-        }
-      }
-      that.setData({
-        categorySelected: {
-          name: categoryName,
-          id: id
-        },
-        scrolltop: 0
-      });
-      that.getGoodsList();
+      return
     }
-  },
-  bindinput(e) {
     this.setData({
-      inputVal: e.detail.value
-    })
+      activeCategory: idx,
+      categorySelected: this.data.categories[idx],
+      scrolltop: 0
+    });
+    this.getGoodsList();
   },
   bindconfirm(e) {
     this.setData({
-      inputVal: e.detail.value
+      inputVal: e.detail
     })
     wx.navigateTo({
       url: '/pages/goods/list?name=' + this.data.inputVal,
@@ -178,6 +158,8 @@ Page({
       if (isLogined) {
         // 处理加入购物车的业务逻辑
         this.addShopCarDone(options)
+      } else {
+        AUTH.openLoginDialog()
       }
     })
   },
@@ -197,7 +179,11 @@ Page({
       const skuCurGoods = skuCurGoodsRes.data
       skuCurGoods.basicInfo.storesBuy = 1
       this.setData({
-        skuCurGoods
+        skuCurGoods,
+        skuGoodsPic: skuCurGoods.basicInfo.pic,
+        selectSizePrice: skuCurGoods.basicInfo.minPrice,
+        selectSizeOPrice: skuCurGoods.basicInfo.originalPrice,
+        skuCurGoodsShow: true
       })
       return
     }
@@ -213,7 +199,8 @@ Page({
       icon: 'success'
     })
     this.setData({
-      skuCurGoods: null
+      skuCurGoods: null,
+      skuCurGoodsShow: false
     })
     wx.showTabBar()
     TOOLS.showTabBarBadge() // 获取购物车数据，显示TabBarBadge
@@ -238,7 +225,8 @@ Page({
   },
   closeSku(){
     this.setData({
-      skuCurGoods: null
+      skuCurGoods: null,
+      skuCurGoodsShow: false
     })
     wx.showTabBar()
   },
@@ -248,16 +236,73 @@ Page({
     // 处理选中
     const skuCurGoods = this.data.skuCurGoods
     const property = skuCurGoods.properties.find(ele => {return ele.id == pid})
+    let child
     property.childsCurGoods.forEach(ele => {
       if (ele.id == id) {
         ele.active = true
+        child = ele
       } else {
         ele.active = false
       }
     })
+    // 显示图片
+    let skuGoodsPic = this.data.skuGoodsPic
+    if (skuCurGoods.subPics && skuCurGoods.subPics.length > 0) {
+      const _subPic = skuCurGoods.subPics.find(ele => {
+        return ele.optionValueId == child.id
+      })
+      if (_subPic) {
+        skuGoodsPic = _subPic.pic
+      }
+    }
     this.setData({
-      skuCurGoods
+      skuCurGoods,
+      skuGoodsPic
     })
+    // 计算价格
+    this.calculateGoodsPrice()
+  },
+  async calculateGoodsPrice() {
+    // 计算最终的商品价格
+    let price = this.data.skuCurGoods.basicInfo.minPrice
+    let originalPrice = this.data.skuCurGoods.basicInfo.originalPrice
+    let totalScoreToPay = this.data.skuCurGoods.basicInfo.minScore
+    let buyNumMax = this.data.skuCurGoods.basicInfo.stores
+    let buyNumber = this.data.skuCurGoods.basicInfo.minBuyNumber
+    // 计算 sku 价格
+    const needSelectNum = this.data.skuCurGoods.properties.length
+    let curSelectNum = 0;
+    let propertyChildIds = "";
+    let propertyChildNames = "";
+    this.data.skuCurGoods.properties.forEach(p => {
+      p.childsCurGoods.forEach(c => {
+        if (c.active) {
+          curSelectNum++;
+          propertyChildIds = propertyChildIds + p.id + ":" + c.id + ",";
+          propertyChildNames = propertyChildNames + p.name + ":" + c.name + "  ";
+        }
+      })
+    })
+    let canSubmit = false;
+    if (needSelectNum == curSelectNum) {
+      canSubmit = true;
+    }
+    if (canSubmit) {
+      const res = await WXAPI.goodsPrice(this.data.skuCurGoods.basicInfo.id, propertyChildIds)
+      if (res.code == 0) {
+        price = res.data.price
+        originalPrice = res.data.originalPrice
+        totalScoreToPay = res.data.score
+        buyNumMax = res.data.stores
+      }
+    }
+    this.setData({
+      selectSizePrice: price,
+      selectSizeOPrice: originalPrice,
+      totalScoreToPay: totalScoreToPay,
+      buyNumMax,
+      buyNumber: (buyNumMax > buyNumber) ? buyNumber : 0
+    });
   },
   addCarSku(){
     const skuCurGoods = this.data.skuCurGoods
@@ -286,5 +331,18 @@ Page({
       sku
     }
     this.addShopCarDone(options)
+  },
+  processLogin(e) {
+    if (!e.detail.userInfo) {
+      wx.showToast({
+        title: '已取消',
+        icon: 'none',
+      })
+      return;
+    }
+    AUTH.register(this);
+  },
+  onReachBottom: function() {
+    
   },
 })
