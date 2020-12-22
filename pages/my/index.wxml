@@ -116,7 +116,7 @@
   </navigator>
   <navigator wx:else url="/pages/fx/apply-status">
     <view class="menu-item">
-      <view class="l">分销中心</view>
+      <view class="l">销售店主</view>
       <image class="next" src="/images/icon/next.png"></image>
     </view>
   </navigator>

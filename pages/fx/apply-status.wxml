@@ -1,7 +1,7 @@
 <view class='noApply' wx:if="{{applyStatus == -1}}">
   <form bindsubmit="bindSave" report-submit="true">
     <image class="logo" src="/images/fx.png" mode="widthFix" />
-    <view class="profile">您还不是分销商，无法使用分销功能</view>
+    <view class="profile">您还不是店主，无法使用店主功能</view>
     <button type="primary" class="mini-btn" formType="submit">申请开通</button>
   </form>
 </view>

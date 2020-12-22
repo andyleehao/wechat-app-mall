@@ -43,6 +43,7 @@
           <view class='good-price-box'>
             <text class="number">{{item.tags}}</text>
             <text class="price">¥ {{item.minPrice}}</text>
+            <text style='color:#aaa;text-decoration:line-through;padding: 15rpx 0rpx 0rpx 6rpx;'>¥ {{item.originalPrice}}</text>
           </view>
         </view>
         <!-- <view class='soldInfo'> -->
