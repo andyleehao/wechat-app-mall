@@ -1,13 +1,16 @@
-const app = getApp()
 const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
 
+const APP = getApp()
+// fixed首次打开不显示标题的bug
+APP.configLoadOK = () => {
+  
+}
+
 Page({
 	data: {
-    wxlogin: true,
-
     balance:0.00,
     freeze:0,
     score:0,
@@ -31,78 +34,53 @@ Page({
       order_hx_uids
     })
     AUTH.checkHasLogined().then(isLogined => {
-      this.setData({
-        wxlogin: isLogined
-      })
       if (isLogined) {
         _this.getUserApiInfo();
         _this.getUserAmount();
         _this.orderStatistics();
+      } else {
+        AUTH.openLoginDialog()
       }
+    })
+    AUTH.wxaCode().then(code => {
+      this.data.code = code
     })
     // 获取购物车数据，显示TabBarBadge
     TOOLS.showTabBarBadge();
   },
-  aboutUs : function () {
-    wx.showModal({
-      title: '关于我们',
-      content: '本系统基于开源小程序商城系统 https://github.com/EastWorld/wechat-app-mall 搭建，祝大家使用愉快！',
-      showCancel:false
-    })
-  },
-  loginOut(){
-    AUTH.loginOut()
-    wx.reLaunch({
-      url: '/pages/my/index'
-    })
-  },
-  getPhoneNumber: function(e) {
-    if (!e.detail.errMsg || e.detail.errMsg != "getPhoneNumber:ok") {
-      wx.showModal({
-        title: '提示',
-        content: e.detail.errMsg,
-        showCancel: false
-      })
-      return;
-    }
-    WXAPI.bindMobileWxa(wx.getStorageSync('token'), e.detail.encryptedData, e.detail.iv).then(res => {
-      if (res.code === 10002) {
-        this.setData({
-          wxlogin: false
-        })
-        return
+  async getUserApiInfo() {
+    const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+    if (res.code == 0) {
+      let _data = {}
+      _data.apiUserInfoMap = res.data
+      if (res.data.base.mobile) {
+        _data.userMobile = res.data.base.mobile
       }
-      if (res.code == 0) {
-        wx.showToast({
-          title: '绑定成功',
-          icon: 'success',
-          duration: 2000
-        })
-        this.getUserApiInfo();
+      if (this.data.order_hx_uids && this.data.order_hx_uids.indexOf(res.data.base.id) != -1) {
+        _data.canHX = true // 具有扫码核销的权限
+      }
+      const adminUserIds = wx.getStorageSync('adminUserIds')
+      if (adminUserIds && adminUserIds.indexOf(res.data.base.id) != -1) {
+        _data.isAdmin = true
+      }
+      if (res.data.peisongMember && res.data.peisongMember.status == 1) {
+        _data.memberChecked = false
       } else {
-        wx.showModal({
-          title: '提示',
-          content: res.msg,
-          showCancel: false
-        })
+        _data.memberChecked = true
       }
-    })
+      this.setData(_data);
+    }
   },
-  getUserApiInfo: function () {
-    var that = this;
-    WXAPI.userDetail(wx.getStorageSync('token')).then(function (res) {
-      if (res.code == 0) {
-        let _data = {}
-        _data.apiUserInfoMap = res.data
-        if (res.data.base.mobile) {
-          _data.userMobile = res.data.base.mobile
-        }
-        if (that.data.order_hx_uids && that.data.order_hx_uids.indexOf(res.data.base.id) != -1) {
-          _data.canHX = true // 具有扫码核销的权限
-        }
-        that.setData(_data);
-      }
-    })
+  async memberCheckedChange() {
+    const res = await WXAPI.peisongMemberChangeWorkStatus(wx.getStorageSync('token'))
+    if (res.code != 0) {
+      wx.showToast({
+        title: res.msg,
+        icon: 'none'
+      })
+    } else {
+      this.getUserApiInfo()
+    }
   },
   getUserAmount: function () {
     var that = this;
@@ -153,15 +131,8 @@ Page({
       url: "/pages/order-list/index?type=" + e.currentTarget.dataset.type
     })
   },
-  cancelLogin() {
-    this.setData({
-      wxlogin: true
-    })
-  },
   goLogin() {
-    this.setData({
-      wxlogin: false
-    })
+    AUTH.openLoginDialog()
   },
   processLogin(e) {
     if (!e.detail.userInfo) {
@@ -190,11 +161,12 @@ Page({
       }
     })
   },
-  clearStorage(){
-    wx.clearStorageSync()
-    wx.showToast({
-      title: '已清除',
-      icon: 'success'
+  
+  goadmin() {
+    wx.navigateToMiniProgram({
+      appId: 'wx5e5b0066c8d3f33d',
+      path: 'pages/login/auto?token=' + wx.getStorageSync('token'),
+      envVersion: 'trial' // develop trial release
     })
-  },
+  }
 })

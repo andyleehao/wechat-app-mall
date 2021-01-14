@@ -128,7 +128,15 @@ Page({
     const linkMan = e.detail.value.linkMan;
     const address = e.detail.value.address;
     const mobile = e.detail.value.mobile;
-    const code = '322000';
+    if (!this.data.addressData) {
+      wx.showToast({
+        title: '请选择定位',
+        icon: 'none',       
+      })
+      return
+    }
+    const latitude = this.data.addressData.latitude
+    const longitude = this.data.addressData.longitude
     if (linkMan == ""){
       wx.showToast({
         title: '请填写联系人姓名',
@@ -140,6 +148,13 @@ Page({
       wx.showToast({
         title: '请填写手机号码',
         icon: 'none'
+      })
+      return
+    }
+    if (!latitude){
+      wx.showToast({
+        title: '请选择定位',
+        icon: 'none',       
       })
       return
     }
@@ -155,8 +170,9 @@ Page({
       linkMan: linkMan,
       address: address,
       mobile: mobile,
-      code: code,
       isDefault: 'true',
+      latitude,
+      longitude
     }
     if (this.data.pIndex > 0) {
       postData.provinceId = this.data.provinces[this.data.pIndex].id
@@ -226,7 +242,17 @@ Page({
     let that = this;
     wx.chooseAddress({
       success: function (res) {
-        console.log(res)
+        // res = {
+        //   cityName: '上海市',
+        //   countyName: '嘉定区',
+        //   detailInfo: '惠民路123号',
+        //   errMsg: 'chooseAddress.ok',
+        //   nationalCode: '310114',
+        //   postalCode: '201800',
+        //   provinceName: '上海市',
+        //   telNumber: '13500000000',
+        //   userName: '测试',
+        // }
         const provinceName = res.provinceName;
         const cityName = res.cityName;
         const diatrictName = res.countyName;
@@ -242,9 +268,12 @@ Page({
           }
           that.provinceChange(e, 0, 0).then(() => {
             // 读取市
-            const cIndex = that.data.cities.findIndex(ele => {
+            let cIndex = that.data.cities.findIndex(ele => {
               return ele.name == cityName
             })
+            if (cIndex == -1) {
+              cIndex = 1 // 兼容直辖市
+            }
             if (cIndex != -1) {
               const e = {
                 detail: {
@@ -278,4 +307,20 @@ Page({
       }
     })
   },
+  chooseLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        const addressData = this.data.addressData ? this.data.addressData : {}
+        addressData.address = res.address + res.name
+        addressData.latitude = res.latitude
+        addressData.longitude = res.longitude
+        this.setData({
+          addressData
+        })
+      },
+      fail: (e) => {
+        console.error(e)
+      },
+    })
+  }
 })

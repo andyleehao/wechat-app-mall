@@ -1,4 +1,5 @@
 const app = getApp()
+const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const wxpay = require('../../utils/pay.js')
@@ -10,7 +11,6 @@ Page({
     totalScoreToPay: 0,
     goodsList: [],
     isNeedLogistics: 0, // 是否需要物流信息
-    allGoodsPrice: 0,
     yunPrice: 0,
     allGoodsAndYunPrice: 0,
     goodsJsonStr: "",
@@ -19,7 +19,7 @@ Page({
 
     hasNoCoupons: true,
     coupons: [],
-    youhuijine: 0, //优惠券金额
+    couponAmount: 0, //优惠券金额
     curCoupon: null, // 当前选择使用的优惠券
     curCouponShowText: '请选择使用优惠券', // 当前选择使用的优惠券
     peisongType: 'kd', // 配送方式 kd,zq 分别表示快递/到店自取
@@ -39,29 +39,33 @@ Page({
         this.doneShow()
       }
     })
+    AUTH.wxaCode().then(code => {
+      this.data.code = code
+    })
   },
   async doneShow() {
-    let shopList = [];
+    let goodsList = [];
     const token = wx.getStorageSync('token')
     //立即购买下单
     if ("buyNow" == this.data.orderType) {
       var buyNowInfoMem = wx.getStorageSync('buyNowInfo');
       this.data.kjId = buyNowInfoMem.kjId;
       if (buyNowInfoMem && buyNowInfoMem.shopList) {
-        shopList = buyNowInfoMem.shopList
+        goodsList = buyNowInfoMem.shopList
       }
     } else {
       //购物车下单
       const res = await WXAPI.shippingCarInfo(token)
       if (res.code == 0) {
-        shopList = res.data.items
+        goodsList = res.data.items.filter(ele => { return ele.selected })
       }
     }
     this.setData({
-      goodsList: shopList,
+      goodsList,
       peisongType: this.data.peisongType
     });
     this.initShippingAddress()
+    this.userAmount()
   },
 
   onLoad(e) {
@@ -74,9 +78,17 @@ Page({
     if (e.pingtuanOpenId) {
       _data.pingtuanOpenId = e.pingtuanOpenId
     }
-    this.setData(_data);
+    this.setData(_data)
+    this.getUserApiInfo()
   },
-
+  async userAmount() {
+    const res = await WXAPI.userAmount(wx.getStorageSync('token'))
+    if (res.code == 0) {
+      this.setData({
+        balance: res.data.balance
+      })
+    }
+  },
   getDistrictId: function (obj, aaa) {
     if (!obj) {
       return "";
@@ -89,7 +101,19 @@ Page({
   remarkChange(e){
     this.data.remark = e.detail.value
   },
-  goCreateOrder(){
+  async goCreateOrder(){
+    // 检测实名认证状态
+    if (wx.getStorageSync('needIdCheck') == 1) {
+      console.log(123);
+      
+      const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+      if (res.code == 0 && !res.data.base.isIdcardCheck) {
+        wx.navigateTo({
+          url: '/pages/idCheck/index',
+        })
+        return
+      }
+    }
     const subscribe_ids = wx.getStorageSync('subscribe_ids')
     if (subscribe_ids) {
       wx.requestSubscribeMessage({
@@ -125,6 +149,15 @@ Page({
     if (that.data.pingtuanOpenId) {
       postData.pingtuanOpenId = that.data.pingtuanOpenId
     }
+    if (postData.peisongType == 'kd' && that.data.curAddressData && that.data.curAddressData.provinceId) {
+      postData.provinceId = that.data.curAddressData.provinceId;
+    }
+    if (postData.peisongType == 'kd' && that.data.curAddressData && that.data.curAddressData.cityId) {
+      postData.cityId = that.data.curAddressData.cityId;
+    }
+    if (postData.peisongType == 'kd' && that.data.curAddressData && that.data.curAddressData.districtId) {
+      postData.districtId = that.data.curAddressData.districtId;
+    }
     if (e && that.data.isNeedLogistics > 0 && postData.peisongType == 'kd') {
       if (!that.data.curAddressData) {
         wx.hideLoading();
@@ -135,11 +168,6 @@ Page({
         return;
       }
       if (postData.peisongType == 'kd') {
-        postData.provinceId = that.data.curAddressData.provinceId;
-        postData.cityId = that.data.curAddressData.cityId;
-        if (that.data.curAddressData.districtId) {
-          postData.districtId = that.data.curAddressData.districtId;
-        }
         postData.address = that.data.curAddressData.address;
         postData.linkMan = that.data.curAddressData.linkMan;
         postData.mobile = that.data.curAddressData.mobile;
@@ -159,10 +187,30 @@ Page({
         })
         return;
       }
+      const extJsonStr = {}
+      if(postData.peisongType == 'zq') {
+        if(!this.data.name) {
+          wx.showToast({
+            title: '请填写联系人',
+            icon: 'none'
+          })
+          return;
+        }
+        if(!this.data.mobile) {
+          wx.showToast({
+            title: '请填写联系电话',
+            icon: 'none'
+          })
+          return;
+        }
+        extJsonStr['联系人'] = this.data.name
+        extJsonStr['联系电话'] = this.data.mobile
+      }
       if(postData.peisongType == 'zq' && this.data.shops) {
         postData.shopIdZt = this.data.shops[this.data.shopIndex].id
         postData.shopNameZt = this.data.shops[this.data.shopIndex].name
       }
+      postData.extJsonStr = JSON.stringify(extJsonStr)
     }
 
     WXAPI.orderCreate(postData).then(function (res) {
@@ -179,7 +227,11 @@ Page({
 
       if (e && "buyNow" != that.data.orderType) {
         // 清空购物车数据
-        WXAPI.shippingCarInfoRemoveAll(loginToken)
+        const keyArrays = []
+        that.data.goodsList.forEach(ele => {
+          keyArrays.push(ele.key)
+        })
+        WXAPI.shippingCarInfoRemoveItem(loginToken, keyArrays.join())
       }
       if (!e) {
         let hasNoCoupons = true
@@ -187,7 +239,15 @@ Page({
         if (res.data.couponUserList) {
           hasNoCoupons = false
           res.data.couponUserList.forEach(ele => {
-            ele.nameExt = ele.name + ' [满' + ele.moneyHreshold + '元可减' + ele.money + '元]'
+            let moneyUnit = '元'
+            if (ele.moneyType == 1) {
+              moneyUnit = '%'
+            }
+            if (ele.moneyHreshold) {
+              ele.nameExt = ele.name + ' [消费满' + ele.moneyHreshold + '元可减' + ele.money + moneyUnit +']'
+            } else {
+              ele.nameExt = ele.name + ' [减' + ele.money + moneyUnit + ']'
+            }
           })
           coupons = res.data.couponUserList
         }
@@ -195,11 +255,11 @@ Page({
         that.setData({
           totalScoreToPay: res.data.score,
           isNeedLogistics: res.data.isNeedLogistics,
-          allGoodsPrice: res.data.amountTotle,
-          allGoodsAndYunPrice: res.data.amountLogistics + res.data.amountTotle,
+          allGoodsAndYunPrice: res.data.amountReal,
           yunPrice: res.data.amountLogistics,
           hasNoCoupons,
-          coupons
+          coupons,
+          couponAmount: res.data.couponAmount
         });
         that.data.pageIsEnd = false
         return;
@@ -209,50 +269,61 @@ Page({
   },
   async processAfterCreateOrder(res) {
     // 直接弹出支付，取消支付的话，去订单列表
-    const res1 = await WXAPI.userAmount(wx.getStorageSync('token'))
-    if (res1.code != 0) {
-      wx.showToast({
-        title: '无法获取用户资金信息',
-        icon: 'none'
-      })
-      wx.redirectTo({
-        url: "/pages/order-list/index"
-      });
-      this.data.pageIsEnd = false
-      return
-    }
-    const money = res.data.amountReal * 1 - res1.data.balance*1
-    if (money <= 0) {
-      // 直接用余额支付
-      wx.showModal({
-        title: '请确认支付',
-        content: `您当前可用余额¥${res1.data.balance}，使用余额支付¥${res.data.amountReal}？`,
-        confirmText: "确认支付",
-        cancelText: "暂不付款",
-        success: res2 => {
-          if (res2.confirm) {
-            // 使用余额支付
-            WXAPI.orderPay(wx.getStorageSync('token'), res.data.id).then(res3 => {
-              if (res3.code != 0) {
-                wx.showToast({
-                  title: res3.msg,
-                  icon: 'none'
+    const balance = this.data.balance
+    if (balance || res.data.amountReal*1 == 0) {
+      // 有余额
+      const money = (res.data.amountReal * 1 - balance*1).toFixed(2)
+      if (money <= 0) {
+        // 余额足够
+        wx.showModal({
+          title: '请确认支付',
+          content: `您当前可用余额¥${balance}，使用余额支付¥${res.data.amountReal}？`,
+          confirmText: "确认支付",
+          cancelText: "暂不付款",
+          success: res2 => {
+            if (res2.confirm) {
+              // 使用余额支付
+              WXAPI.orderPay(wx.getStorageSync('token'), res.data.id).then(res3 => {
+                if (res3.code != 0) {
+                  wx.showToast({
+                    title: res3.msg,
+                    icon: 'none'
+                  })
+                  return
+                }
+                wx.redirectTo({
+                  url: "/pages/order-list/index"
                 })
-                return
-              }
+              })
+            } else {
               wx.redirectTo({
                 url: "/pages/order-list/index"
               })
-            })
-          } else {
-            wx.redirectTo({
-              url: "/pages/order-list/index"
-            })
+            }
           }
-        }
-      })      
+        })
+      } else {
+        // 余额不够
+        wx.showModal({
+          title: '请确认支付',
+          content: `您当前可用余额¥${balance}，仍需支付¥${money}`,
+          confirmText: "确认支付",
+          cancelText: "暂不付款",
+          success: res2 => {
+            if (res2.confirm) {
+              // 使用余额支付
+              wxpay.wxpay('order', money, res.data.id, "/pages/order-list/index");
+            } else {
+              wx.redirectTo({
+                url: "/pages/order-list/index"
+              })
+            }
+          }
+        })
+      }
     } else {
-      wxpay.wxpay('order', money, res.data.id, "/pages/order-list/index");
+      // 没余额
+      wxpay.wxpay('order', res.data.amountReal, res.data.id, "/pages/order-list/index");
     }
   },
   async initShippingAddress() {
@@ -273,10 +344,8 @@ Page({
     if (goodsList.length == 0) {
       return
     }
-    var goodsJsonStr = "[";
+    const goodsJsonStr = []
     var isNeedLogistics = 0;
-    var allGoodsPrice = 0;
-
 
     let inviter_id = 0;
     let inviter_id_storge = wx.getStorageSync('referrer');
@@ -288,28 +357,37 @@ Page({
       if (carShopBean.logistics || carShopBean.logisticsId) {
         isNeedLogistics = 1;
       }
-      allGoodsPrice += carShopBean.price * carShopBean.number;
 
-      var goodsJsonStrTmp = '';
-      if (i > 0) {
-        goodsJsonStrTmp = ",";
+      const _goodsJsonStr = {
+        propertyChildIds: carShopBean.propertyChildIds
       }
       if (carShopBean.sku && carShopBean.sku.length > 0) {
         let propertyChildIds = ''
         carShopBean.sku.forEach(option => {
           propertyChildIds = propertyChildIds + ',' + option.optionId + ':' + option.optionValueId
         })
-        carShopBean.propertyChildIds = propertyChildIds
+        _goodsJsonStr.propertyChildIds = propertyChildIds
       }
-      goodsJsonStrTmp += '{"goodsId":' + carShopBean.goodsId + ',"number":' + carShopBean.number + ',"propertyChildIds":"' + carShopBean.propertyChildIds + '","logisticsType":0, "inviter_id":' + inviter_id + '}';
-      goodsJsonStr += goodsJsonStrTmp;
-
+      if (carShopBean.additions && carShopBean.additions.length > 0) {
+        let goodsAdditionList = []
+        carShopBean.additions.forEach(option => {
+          goodsAdditionList.push({
+            pid: option.pid,
+            id: option.id
+          })
+        })
+        _goodsJsonStr.goodsAdditionList = goodsAdditionList
+      }
+      _goodsJsonStr.goodsId = carShopBean.goodsId
+      _goodsJsonStr.number = carShopBean.number
+      _goodsJsonStr.logisticsType = 0
+      _goodsJsonStr.inviter_id = inviter_id
+      goodsJsonStr.push(_goodsJsonStr)
 
     }
-    goodsJsonStr += "]";
     this.setData({
       isNeedLogistics: isNeedLogistics,
-      goodsJsonStr: goodsJsonStr
+      goodsJsonStr: JSON.stringify(goodsJsonStr)
     });
     this.createOrder();
   },
@@ -326,10 +404,10 @@ Page({
   bindChangeCoupon: function (e) {
     const selIndex = e.detail.value;
     this.setData({
-      youhuijine: this.data.coupons[selIndex].money,
       curCoupon: this.data.coupons[selIndex],
       curCouponShowText: this.data.coupons[selIndex].nameExt
     });
+    this.processYunfei()
   },
   radioChange (e) {
     this.setData({
@@ -390,5 +468,47 @@ Page({
     wx.makePhoneCall({
       phoneNumber: shop.linkPhone,
     })
+  },
+  async getUserApiInfo() {
+    const res = await WXAPI.userDetail(wx.getStorageSync('token'))
+    if (res.code == 0) {
+      this.setData({
+        mobile: res.data.base.mobile
+      })
+    }
+  },
+  async getPhoneNumber(e) {
+    if (!e.detail.errMsg || e.detail.errMsg != "getPhoneNumber:ok") {
+      wx.showToast({
+        title: e.detail.errMsg,
+        icon: 'none'
+      })
+      return;
+    }
+    const res = await WXAPI.bindMobileWxapp(wx.getStorageSync('token'), this.data.code, e.detail.encryptedData, e.detail.iv)
+    AUTH.wxaCode().then(code => {
+      this.data.code = code
+    })
+    if (res.code === 10002) {
+      wx.showToast({
+        title: '请先登陆',
+        icon: 'none'
+      })
+      return
+    }
+    if (res.code == 0) {
+      wx.showToast({
+        title: '读取成功',
+        icon: 'success'
+      })
+      this.setData({
+        mobile: res.data
+      })
+    } else {
+      wx.showToast({
+        title: res.msg,
+        icon: 'none'
+      })
+    }
   },
 })
