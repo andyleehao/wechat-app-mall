@@ -8,7 +8,6 @@ Page({
    */
   data: {
     categories: [],
-    activeCategory: 0,
     categorySelected: {
       name: '',
       id: ''
@@ -83,24 +82,45 @@ Page({
       currentGoods: res.data
     });
   },
-  onCategoryClick(e) {
-    const idx = e.target.dataset.idx
-    if (idx == this.data.activeCategory) {
-      this.setData({
+  toDetailsTap: function(e) {
+    wx.navigateTo({
+      url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
+    })
+  },
+  onCategoryClick: function(e) {
+    var that = this;
+    var id = e.target.dataset.id;
+    if (id === that.data.categorySelected.id) {
+      that.setData({
         scrolltop: 0,
       })
-      return
+    } else {
+      var categoryName = '';
+      for (var i = 0; i < that.data.categories.length; i++) {
+        let item = that.data.categories[i];
+        if (item.id == id) {
+          categoryName = item.name;
+          break;
+        }
+      }
+      that.setData({
+        categorySelected: {
+          name: categoryName,
+          id: id
+        },
+        scrolltop: 0
+      });
+      that.getGoodsList();
     }
+  },
+  bindinput(e) {
     this.setData({
-      activeCategory: idx,
-      categorySelected: this.data.categories[idx],
-      scrolltop: 0
-    });
-    this.getGoodsList();
+      inputVal: e.detail.value
+    })
   },
   bindconfirm(e) {
     this.setData({
-      inputVal: e.detail
+      inputVal: e.detail.value
     })
     wx.navigateTo({
       url: '/pages/goods/list?name=' + this.data.inputVal,
@@ -108,7 +128,7 @@ Page({
   },
   onShareAppMessage() {    
     return {
-      title: wx.getStorageSync('share_profile'),
+      title: '"' + wx.getStorageSync('mallName') + '" ' + wx.getStorageSync('share_profile'),
       path: '/pages/index/index?inviter_id=' + wx.getStorageSync('uid')
     }
   },
@@ -341,8 +361,5 @@ Page({
       return;
     }
     AUTH.register(this);
-  },
-  onReachBottom: function() {
-    
   },
 })
