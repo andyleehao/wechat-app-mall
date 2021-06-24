@@ -13,6 +13,7 @@
     "autoAudits": false,
     "showShadowRootInWxmlPanel": true,
     "scopeDataCheck": false,
+    "uglifyFileName": false,
     "checkInvalidKey": true,
     "checkSiteMap": true,
     "uploadWithSourceMap": true,
@@ -25,7 +26,6 @@
       "disablePlugins": [],
       "outputPath": ""
     },
-    "bundle": false,
     "useIsolateContext": true,
     "useCompilerModule": true,
     "userConfirmedUseCompilerModuleSwitch": false,
@@ -35,19 +35,13 @@
     "minifyWXSS": true
   },
   "compileType": "miniprogram",
-  "libVersion": "2.14.3",
+  "libVersion": "2.16.0",
   "appid": "wxa46b09d413fbcaff",
-  "projectname": "%E5%A4%A9%E4%BD%BF%E7%AB%A5%E8%A3%85",
+  "projectname": "天使童装",
   "scripts": {},
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},
   "condition": {
-    "search": {
-      "list": []
-    },
-    "conversation": {
-      "list": []
-    },
     "plugin": {
       "list": []
     },
@@ -119,6 +113,13 @@
           "id": -1,
           "name": "notice",
           "pathName": "pages/notice/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "带参数进首页",
+          "pathName": "pages/index/index",
+          "query": "a=1&b=2&c=3",
           "scene": null
         }
       ]

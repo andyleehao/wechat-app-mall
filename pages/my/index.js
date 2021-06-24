@@ -1,13 +1,6 @@
-const CONFIG = require('../../config.js')
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
-
-const APP = getApp()
-// fixed首次打开不显示标题的bug
-APP.configLoadOK = () => {
-  
-}
 
 Page({
 	data: {
@@ -23,30 +16,48 @@ Page({
     count_id_no_pay: 0,
     count_id_no_reputation: 0,
     count_id_no_transfer: 0,
+
+    // 判断有没有用户详细资料
+    userInfoStatus: 0 // 0 未读取 1 没有详细信息 2 有详细信息
   },
 	onLoad() {
+    this.readConfigVal()
+    // 补偿写法
+    getApp().configLoadOK = () => {
+      this.readConfigVal()
+    }
 	},
   onShow() {
     const _this = this
-    const order_hx_uids = wx.getStorageSync('order_hx_uids')
-    this.setData({
-      version: CONFIG.version,
-      order_hx_uids
-    })
     AUTH.checkHasLogined().then(isLogined => {
       if (isLogined) {
         _this.getUserApiInfo();
         _this.getUserAmount();
         _this.orderStatistics();
+        TOOLS.showTabBarBadge();
       } else {
-        AUTH.openLoginDialog()
+        AUTH.authorize().then(res => {
+          AUTH.bindSeller()
+          _this.getUserApiInfo();
+          _this.getUserAmount();
+          _this.orderStatistics();
+          TOOLS.showTabBarBadge();
+        })
       }
     })
     AUTH.wxaCode().then(code => {
       this.data.code = code
     })
-    // 获取购物车数据，显示TabBarBadge
-    TOOLS.showTabBarBadge();
+  },
+  readConfigVal() {
+    this.setData({
+      order_hx_uids: wx.getStorageSync('order_hx_uids'),
+      cps_open: wx.getStorageSync('cps_open'),
+      recycle_open: wx.getStorageSync('recycle_open'),
+      show_3_seller: wx.getStorageSync('show_3_seller'),
+      show_quan_exchange_score: wx.getStorageSync('show_quan_exchange_score'),
+      show_score_exchange_growth: wx.getStorageSync('show_score_exchange_growth'),
+    })
   },
   async getUserApiInfo() {
     const res = await WXAPI.userDetail(wx.getStorageSync('token'))
@@ -55,6 +66,11 @@ Page({
       _data.apiUserInfoMap = res.data
       if (res.data.base.mobile) {
         _data.userMobile = res.data.base.mobile
+      }
+      if (res.data.base.nick && res.data.base.avatarUrl) {
+        _data.userInfoStatus = 2
+      } else {
+        _data.userInfoStatus = 1
       }
       if (this.data.order_hx_uids && this.data.order_hx_uids.indexOf(res.data.base.id) != -1) {
         _data.canHX = true // 具有扫码核销的权限
@@ -131,19 +147,6 @@ Page({
       url: "/pages/order-list/index?type=" + e.currentTarget.dataset.type
     })
   },
-  goLogin() {
-    AUTH.openLoginDialog()
-  },
-  processLogin(e) {
-    if (!e.detail.userInfo) {
-      wx.showToast({
-        title: '已取消',
-        icon: 'none',
-      })
-      return;
-    }
-    AUTH.register(this);
-  },
   scanOrderCode(){
     wx.scanCode({
       onlyFromCamera: true,
@@ -161,12 +164,48 @@ Page({
       }
     })
   },
-  
-  goadmin() {
-    wx.navigateToMiniProgram({
-      appId: 'wx5e5b0066c8d3f33d',
-      path: 'pages/login/auto?token=' + wx.getStorageSync('token'),
-      envVersion: 'trial' // develop trial release
+  updateUserInfo(e) {
+    wx.getUserProfile({
+      lang: 'zh_CN',
+      desc: '用于完善会员资料',
+      success: res => {
+        console.log(res);
+        this._updateUserInfo(res.userInfo)
+      },
+      fail: err => {
+        console.log(err);
+        wx.showToast({
+          title: err.errMsg,
+          icon: 'none'
+        })
+      }
     })
-  }
+  },
+  async _updateUserInfo(userInfo) {
+    const postData = {
+      token: wx.getStorageSync('token'),
+      nick: userInfo.nickName,
+      avatarUrl: userInfo.avatarUrl,
+      city: userInfo.city,
+      province: userInfo.province,
+      gender: userInfo.gender,
+    }
+    const res = await WXAPI.modifyUserInfo(postData)
+    if (res.code != 0) {
+      wx.showToast({
+        title: res.msg,
+        icon: 'none'
+      })
+      return
+    }
+    wx.showToast({
+      title: '登陆成功',
+    })
+    this.getUserApiInfo()
+  },
+  gogrowth() {
+    wx.navigateTo({
+      url: '/pages/score/growth',
+    })
+  },
 })

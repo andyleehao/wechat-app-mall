@@ -7,8 +7,10 @@
     "pages/notice/show",
     "pages/category/category",
     "pages/goods/list",
+    "pages/goods/list-vop",
     "pages/goods/fav",
     "pages/goods-details/index",
+    "pages/goods-details/vop",
     "pages/shop-cart/index",
     "pages/to-pay-order/index",
     "pages/select-address/index",
@@ -41,7 +43,6 @@
     "pages/help/index",
     "pages/about/index",
     "pages/idCheck/index",
-    "pages/videoCall/videoCall",
     "pages/peisong/detail",
     "pages/peisong/orders",
     "pages/pwd-pay/reset",
@@ -51,7 +52,45 @@
     "pages/search/index",
     "pages/my/info",
     "pages/my/setting",
-    "pages/my/info-menu"
+    "pages/my/info-menu",
+    "pages/recycle/index",
+    "pages/recycle/orders",
+    "pages/recycle/order-detail"
+  ],
+  "subpackages": [
+    {
+      "root": "packageStreamMedia",
+      "name": "packageStreamMedia",
+      "pages": [
+        "pages/videoCall/videoCall",
+        "pages/live-anchor/index",
+        "pages/live-anchor/list",
+        "pages/live-client/list",
+        "pages/live-client/client"
+      ]
+    },
+    {
+      "root": "packageCps",
+      "name": "packageCps",
+      "pages": [
+        "pages/goods-details/cps-jd",
+        "pages/goods-details/cps-pdd",
+        "pages/goods-details/cps-taobao",
+        "pages/order-list/cps"
+      ]
+    },
+    {
+      "root": "demos",
+      "name": "demos",
+      "pages": [
+        "pages/echarts/line",
+        "pages/business/index",
+        "pages/bind-phone/index",
+        "pages/merchant/index",
+        "pages/record-list/index",
+        "pages/ab/index"
+      ]
+    }
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -128,6 +167,7 @@
     "van-goods-action-icon": "@vant/weapp/goods-action-icon/index",
     "van-goods-action-button": "@vant/weapp/goods-action-button/index",
     "van-popup": "@vant/weapp/popup/index",
+    "van-picker": "@vant/weapp/picker/index",
     "van-stepper": "@vant/weapp/stepper/index",
     "van-sticky": "@vant/weapp/sticky/index",
     "van-dialog": "@vant/weapp/dialog/index",
@@ -140,7 +180,10 @@
     "van-grid-item": "@vant/weapp/grid-item/index",
     "van-image": "@vant/weapp/image/index",
     "van-tab": "@vant/weapp/tab/index",
-    "van-tabs": "@vant/weapp/tabs/index"
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-overlay": "@vant/weapp/overlay/index",
+    "van-datetime-picker": "@vant/weapp/datetime-picker/index",
+    "van-area": "@vant/weapp/area/index"
   },
   "sitemapLocation": "sitemap.json"
 }

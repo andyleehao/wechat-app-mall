@@ -1,5 +1,6 @@
 const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
+var address_parse = require("../../utils/address_parse")
 Page({
   data: {
     provinces: undefined,// 省份数据数组
@@ -9,7 +10,7 @@ Page({
     areas: undefined,// 区县数数组
     aIndex: 0,//选择的区下标
   },
-  async provinces(provinceId, cityId, districtId) {
+  async provinces(provinceId, cityId, districtId, streetId) {
     const res = await WXAPI.province()
     if (res.code == 0) {
       const provinces = [{
@@ -28,11 +29,11 @@ Page({
       })
       if (provinceId) {
         const e = { detail: { value: pIndex}}
-        this.provinceChange(e, cityId, districtId)
+        this.provinceChange(e, cityId, districtId, streetId)
       }
     }
   },
-  async provinceChange(e, cityId, districtId) {
+  async provinceChange(e, cityId, districtId, streetId) {
     const index = e.detail.value
     this.setData({
       pIndex: index
@@ -65,11 +66,11 @@ Page({
       })
       if (cityId) {
         const e = { detail: { value: cIndex } }
-        this.cityChange(e, districtId)
+        this.cityChange(e, districtId, streetId)
       }
     }
   },
-  async cityChange(e, districtId) {
+  async cityChange(e, districtId, streetId) {
     const index = e.detail.value
     this.setData({
       cIndex: index
@@ -100,15 +101,55 @@ Page({
       })
       if (districtId) {
         const e = { detail: { value: aIndex } }
-        this.areaChange(e)
+        this.areaChange(e, streetId)
       }
     }
   },
-  async areaChange(e) {
+  async areaChange(e, streetId) {
     const index = e.detail.value
     this.setData({
       aIndex: index
-    })  
+    })
+    const shipping_address_region_level = wx.getStorageSync('shipping_address_region_level')
+    if (shipping_address_region_level == 3) {
+      return
+    }
+    //
+    const pid = this.data.areas[index].id
+    if (pid == 0) {
+      this.setData({
+        streets: null,
+        sIndex: 0
+      })
+      return
+    }
+    const res = await WXAPI.nextRegion(pid);
+    if (res.code == 0) {
+      const streets = [{
+        id: 0,
+        name: '请选择'
+      }].concat(res.data)
+      let sIndex = 0
+      if (streetId) {
+        sIndex = streets.findIndex(ele => {
+          return ele.id == streetId
+        })
+      }
+      this.setData({
+        sIndex,
+        streets
+      })
+      if (streetId) {
+        const e = { detail: { value: sIndex } }
+        this.streetChange(e)
+      }
+    }
+  },
+  async streetChange(e) {
+    const index = e.detail.value
+    this.setData({
+      sIndex: index
+    })
   },
   async bindSave(e) {
     if (this.data.pIndex == 0 ) {
@@ -125,18 +166,36 @@ Page({
       })
       return
     }
+    if (this.data.aIndex == 0 ) {
+      wx.showToast({
+        title: '请选择区县',
+        icon: 'none'
+      })
+      return
+    }
+    const shipping_address_region_level = wx.getStorageSync('shipping_address_region_level')
+    if (shipping_address_region_level == 4) {
+      if (this.data.sIndex == 0 ) {
+        wx.showToast({
+          title: '请选择社区/街道',
+          icon: 'none'
+        })
+        return
+      }
+    }
+    
     const linkMan = e.detail.value.linkMan;
     const address = e.detail.value.address;
     const mobile = e.detail.value.mobile;
-    if (!this.data.addressData) {
+    if (this.data.shipping_address_gps == '1' && !this.data.addressData) {
       wx.showToast({
         title: '请选择定位',
         icon: 'none',       
       })
       return
     }
-    const latitude = this.data.addressData.latitude
-    const longitude = this.data.addressData.longitude
+    const latitude = this.data.addressData ? this.data.addressData.latitude : null
+    const longitude = this.data.addressData ? this.data.addressData.longitude : null
     if (linkMan == ""){
       wx.showToast({
         title: '请填写联系人姓名',
@@ -151,12 +210,25 @@ Page({
       })
       return
     }
-    if (!latitude){
+    const postData = {
+      token: wx.getStorageSync('token'),
+      linkMan: linkMan,
+      address: address,
+      mobile: mobile,
+      isDefault: 'true'
+    }
+    if (this.data.shipping_address_gps == '1' && !latitude){
       wx.showToast({
         title: '请选择定位',
         icon: 'none',       
       })
       return
+    }
+    if (latitude) {
+      postData.latitude = latitude
+    }
+    if (longitude) {
+      postData.longitude = longitude
     }
     if (address == ""){
       wx.showToast({
@@ -165,15 +237,7 @@ Page({
       })
       return
     }    
-    const postData = {
-      token: wx.getStorageSync('token'),
-      linkMan: linkMan,
-      address: address,
-      mobile: mobile,
-      isDefault: 'true',
-      latitude,
-      longitude
-    }
+    
     if (this.data.pIndex > 0) {
       postData.provinceId = this.data.provinces[this.data.pIndex].id
     }
@@ -182,6 +246,9 @@ Page({
     }
     if (this.data.aIndex > 0) {
       postData.districtId = this.data.areas[this.data.aIndex].id
+    }    
+    if (this.data.sIndex > 0) {
+      postData.streetId = this.data.streets[this.data.sIndex].id
     }    
     let apiResult
     if (this.data.id) {
@@ -203,6 +270,8 @@ Page({
     }
   },
   async onLoad(e) {
+    // this.initFromClipboard('广州市天河区天河东路6号粤电广场北塔2302，徐小姐，18588998859')
+    const _this = this
     if (e.id) { // 修改初始化数据库数据
       const res = await WXAPI.addressDetail(wx.getStorageSync('token'), e.id)
       if (res.code == 0) {
@@ -210,7 +279,7 @@ Page({
           id: e.id,
           addressData: res.data.info
         })
-        this.provinces(res.data.info.provinceId, res.data.info.cityId, res.data.info.districtId)
+        this.provinces(res.data.info.provinceId, res.data.info.cityId, res.data.info.districtId, res.data.info.streetId)
       } else {
         wx.showModal({
           title: '错误',
@@ -220,7 +289,37 @@ Page({
       }
     } else {
       this.provinces()
+      wx.getClipboardData({
+        success (res){
+          if (res.data) {
+            _this.initFromClipboard(res.data)
+          }
+        }
+      })
     }
+    this.setData({
+      shipping_address_gps: wx.getStorageSync('shipping_address_gps')
+    })
+  },
+  async initFromClipboard (str) {
+    address_parse.smart(str).then(res => {
+      console.log('ggggggg', res);
+      if (res.name && res.phone && res.address) {
+        
+        // 检测到收货地址
+        this.setData({
+          addressData: {
+            provinceId: res.provinceCode,
+            cityId: res.cityCode,
+            districtId: res.countyCode,
+            linkMan: res.name,
+            mobile: res.phone,
+            address: res.address,
+          }
+        })
+        this.provinces(res.provinceCode, res.cityCode, res.countyCode)
+      }
+    })
   },
   deleteAddress: function (e) {
     const id = e.currentTarget.dataset.id;

@@ -28,6 +28,9 @@ Page({
     wx.showShareMenu({
       withShareTicket: true
     })
+    this.setData({
+      categoryMod: wx.getStorageSync('categoryMod')
+    })
     this.categories();
   },
   async categories() {
@@ -39,31 +42,43 @@ Page({
     let activeCategory = 0
     let categorySelected = this.data.categorySelected
     if (res.code == 0) {
-      if (this.data.categorySelected.id) {
-        activeCategory = res.data.findIndex(ele => {
-          return ele.id == this.data.categorySelected.id
-        })
-        categorySelected = res.data[activeCategory]
-      } else {
-        categorySelected = res.data[0]
-      }
-      const categories = res.data
+      const categories = res.data.filter(ele => {
+        return !ele.vopCid1 && !ele.vopCid2
+      })
       categories.forEach(p => {
         p.childs = categories.filter(ele => {
           return p.id == ele.pid
         })
-        console.log(p.childs);
       })
+      const firstCategories = categories.filter(ele => { return ele.level == 1 })
+      if (this.data.categorySelected.id) {
+        activeCategory = firstCategories.findIndex(ele => {
+          return ele.id == this.data.categorySelected.id
+        })
+        categorySelected = firstCategories[activeCategory]
+      } else {
+        categorySelected = firstCategories[0]
+      }
+      const resAd = await WXAPI.adPosition('category_' + categorySelected.id)
+      let adPosition = null
+      if (resAd.code === 0) {
+        adPosition = resAd.data
+      }
       this.setData({
         page: 1,
         activeCategory,
         categories,
-        categorySelected
+        firstCategories,
+        categorySelected,
+        adPosition
       })
       this.getGoodsList()
     }
   },
   async getGoodsList() {
+    if (this.data.categoryMod == 2) {
+      return
+    }
     wx.showLoading({
       title: '',
     })
@@ -110,7 +125,7 @@ Page({
       })
     }
   },
-  onCategoryClick(e) {
+  async onCategoryClick(e) {
     const idx = e.target.dataset.idx
     if (idx == this.data.activeCategory) {
       this.setData({
@@ -118,12 +133,19 @@ Page({
       })
       return
     }
+    const categorySelected = this.data.firstCategories[idx]
+    const res = await WXAPI.adPosition('category_' + categorySelected.id)
+    let adPosition = null
+    if (res.code === 0) {
+      adPosition = res.data
+    }
     this.setData({
       page: 1,
       secondCategoryId: '',
       activeCategory: idx,
-      categorySelected: this.data.categories[idx],
-      scrolltop: 0
+      categorySelected,
+      scrolltop: 0,
+      adPosition
     });
     this.getGoodsList();
   },
@@ -168,8 +190,6 @@ Page({
     if (_categoryId) {
       this.data.categorySelected.id = _categoryId
       this.categories();
-    } else {
-      this.data.categorySelected.id = null
     }
   },
   async addShopCar(e) {
@@ -201,7 +221,7 @@ Page({
         // 处理加入购物车的业务逻辑
         this.addShopCarDone(options)
       } else {
-        AUTH.openLoginDialog()
+        AUTH.login(this)
       }
     })
   },
@@ -329,8 +349,13 @@ Page({
     if (needSelectNum == curSelectNum) {
       canSubmit = true;
     }
+    const token = wx.getStorageSync('token')
     if (canSubmit) {
-      const res = await WXAPI.goodsPrice(this.data.skuCurGoods.basicInfo.id, propertyChildIds)
+      const res = await WXAPI.goodsPriceV2({
+        token: token ? token : '',
+        goodsId: this.data.skuCurGoods.basicInfo.id,
+        propertyChildIds: propertyChildIds
+      })
       if (res.code == 0) {
         price = res.data.price
         originalPrice = res.data.originalPrice
@@ -374,18 +399,16 @@ Page({
     }
     this.addShopCarDone(options)
   },
-  processLogin(e) {
-    if (!e.detail.userInfo) {
-      wx.showToast({
-        title: '已取消',
-        icon: 'none',
-      })
-      return;
-    }
-    AUTH.register(this);
-  },
   goodsGoBottom() {
     this.data.page++
     this.getGoodsList()
+  },
+  adPositionClick(e) {
+    const url = e.target.dataset.url
+    if (url) {
+      wx.navigateTo({
+        url: url
+      })
+    }
   },
 })

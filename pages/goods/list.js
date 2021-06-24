@@ -9,6 +9,7 @@ Page({
     listType: 1, // 1为1个商品一行，2为2个商品一行    
     name: '', // 搜索关键词
     orderBy: '', // 排序规则
+    page: 1 // 读取第几页
   },
 
   /**
@@ -20,30 +21,35 @@ Page({
       categoryId: options.categoryId
     })
     this.search()
+    this.readConfigVal()
+    // 补偿写法
+    getApp().configLoadOK = () => {
+      this.readConfigVal()
+    }
   },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow: function () {
 
   },
+  readConfigVal() {
+    const show_seller_number = wx.getStorageSync('show_seller_number')
+    const goods_search_show_type = wx.getStorageSync('goods_search_show_type')
+    let listType = 1
+    if (goods_search_show_type == 2) {
+      listType = 2
+    }
+    this.setData({
+      show_seller_number,
+      listType
+    })
+  },
   async search(){
-    // 搜索商品
     wx.showLoading({
       title: '加载中',
     })
     const _data = {
       orderBy: this.data.orderBy,
-      page: 1,
-      pageSize: 500,
+      page: this.data.page,
+      pageSize: 20,
     }
     if (this.data.name) {
       _data.k = this.data.name
@@ -54,41 +60,36 @@ Page({
     const res = await WXAPI.goods(_data)
     wx.hideLoading()
     if (res.code == 0) {
-      this.setData({
-        goods: res.data,
-      })
+      if (this.data.page == 1) {
+        this.setData({
+          goods: res.data,
+        })
+      } else {
+        this.setData({
+          goods: this.data.goods.concat(res.data),
+        })
+      }
     } else {
-      this.setData({
-        goods: null,
-      })
+      if (this.data.page == 1) {
+        this.setData({
+          goods: null,
+        })
+      } else {
+        wx.showToast({
+          title: '没有更多了',
+          icon: 'none'
+        })
+      }
     }
   },
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh: function () {
 
   },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-
+  onReachBottom() {
+    this.setData({
+      page: this.data.page + 1
+    });
+    this.search()
   },
   changeShowType(){
     if (this.data.listType == 1) {
@@ -108,12 +109,14 @@ Page({
   },
   bindconfirm(e){
     this.setData({
+      page: 1,
       name: e.detail.value
     })
     this.search()
   },
   filter(e){
     this.setData({
+      page: 1,
       orderBy: e.currentTarget.dataset.val
     })
     this.search()

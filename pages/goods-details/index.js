@@ -1,14 +1,11 @@
 const WXAPI = require('apifm-wxapi')
-const app = getApp();
-const CONFIG = require('../../config.js')
+const TOOLS = require('../../utils/tools.js')
 const AUTH = require('../../utils/auth')
-const SelectSizePrefix = "选择："
 import Poster from 'wxa-plugin-canvas/poster/poster'
 
 Page({
   data: {
-    wxlogin: true,
-
+    createTabs: false, //绘制tabs
     goodsDetail: {},
     hasMoreSelect: false,
     selectSizePrice: 0,
@@ -19,14 +16,40 @@ Page({
     buyNumber: 0,
     buyNumMin: 1,
     buyNumMax: 0,
-
     propertyChildIds: "",
     propertyChildNames: "",
     canSubmit: false, //  选中规格尺寸时候是否允许加入购物车
     shopType: "addShopCar", //购物类型，加入购物车或立即购买，默认为加入购物车
   },
-  async onLoad(e) {
+  bindscroll(e) {
+    //计算页面 轮播图、详情、评价(砍价)view 高度
+    this.getTopHeightFunction()
+    var tabsHeight = this.data.tabsHeight //顶部距离（tabs高度）
+    if (this.data.tabs[0].topHeight-tabsHeight<=0 && 0 < this.data.tabs[1].topHeight-tabsHeight) { //临界值，根据自己的需求来调整
+      this.setData({
+        active: this.data.tabs[0].tabs_name //设置当前标签栏
+      })
+    } else if (this.data.tabs.length == 2) {
+      this.setData({
+        active: this.data.tabs[1].tabs_name
+      })
+    } else if (this.data.tabs[1].topHeight-tabsHeight<=0 && 0 < this.data.tabs[2].topHeight-tabsHeight) {
+      this.setData({
+        active: this.data.tabs[1].tabs_name
+      })
+    } else if (this.data.tabs[2].topHeight-tabsHeight<=0) {
+      this.setData({
+        active: this.data.tabs[2].tabs_name
+      })
+    }
+  },
+  onLoad(e) {
     // e.id = 122843
+    // 读取分享链接中的邀请人编号
+    if (e && e.inviter_id) {
+      wx.setStorageSync('referrer', e.inviter_id)
+    }
+    // 读取小程序码中的邀请人编号
     if (e && e.scene) {
       const scene = decodeURIComponent(e.scene) // 处理扫码进商品详情页面的逻辑
       if (scene && scene.split(',').length >= 2) {
@@ -34,22 +57,69 @@ Page({
         wx.setStorageSync('referrer', scene.split(',')[1])
       }
     }
+    // 静默式授权注册/登陆
+    AUTH.authorize().then(res => {
+      AUTH.bindSeller()
+    })
     this.data.goodsId = e.id
-    const that = this
-    this.data.kjJoinUid = e.kjJoinUid    
+    this.data.kjJoinUid = e.kjJoinUid
     let goodsDetailSkuShowType = wx.getStorageSync('goodsDetailSkuShowType')
     if (!goodsDetailSkuShowType) {
       goodsDetailSkuShowType = 0
+    }
+    // 补偿写法
+    getApp().configLoadOK = () => {
+      this.readConfigVal()
     }
     this.setData({
       goodsDetailSkuShowType,
       curuid: wx.getStorageSync('uid')
     })
-    this.reputation(e.id)
+    this.readConfigVal()
+    this.getGoodsDetailAndKanjieInfo(this.data.goodsId)
     this.shippingCartInfo()
     this.goodsAddition()
-  },  
-  async goodsAddition(){
+  },
+  readConfigVal() {
+    // 读取系统参数
+    const hide_reputation = wx.getStorageSync('hide_reputation')
+    let tabs = [{
+      tabs_name: '商品简介',
+      view_id: 'swiper-container',
+      topHeight: 0
+    }, {
+      tabs_name: '商品详情',
+      view_id: 'goods-des-info',
+      topHeight: 0,
+    }, {
+      tabs_name: '商品评价',
+      view_id: 'reputation',
+      topHeight: 0,
+    }]
+    if (hide_reputation == '1') {
+      // 隐藏评价
+      tabs = [{
+        tabs_name: '商品简介',
+        view_id: 'swiper-container',
+        topHeight: 0
+      }, {
+        tabs_name: '商品详情',
+        view_id: 'goods-des-info',
+        topHeight: 0,
+      }]
+    } else {
+      // 读取评价
+      if (!this.data.reputation) { // 保证只读取一次
+        this.reputation(this.data.goodsId)
+      }
+    }
+    this.setData({
+      show_wx_quanzi: wx.getStorageSync('show_wx_quanzi'),
+      hide_reputation,
+      tabs
+    })
+  },
+  async goodsAddition() {
     const res = await WXAPI.goodsAddition(this.data.goodsId)
     if (res.code == 0) {
       this.setData({
@@ -58,28 +128,52 @@ Page({
       })
     }
   },
-  async shippingCartInfo(){
-    const token = wx.getStorageSync('token')
-    if (!token) {
-      return
-    }
-    const res = await WXAPI.shippingCarInfo(token)
-    if (res.code == 0) {
-      this.setData({
-        shopNum: res.data.number
-      })
-    }
+  async shippingCartInfo() {
+    const number = await TOOLS.showTabBarBadge(true)
+    this.setData({
+      shopNum: number
+    })
   },
-  onShow (){
+  onShow() {
+    this.setData({
+      createTabs: true //绘制tabs
+    })
+    //计算tabs高度
+    var query = wx.createSelectorQuery();
+    query.select('#tabs').boundingClientRect((rect) => {
+      var tabsHeight = rect.height
+      this.setData({
+        tabsHeight:tabsHeight
+      })
+    }).exec()
+
     AUTH.checkHasLogined().then(isLogined => {
       if (isLogined) {
-        this.setData({
-          wxlogin: isLogined
-        })
         this.goodsFavCheck()
       }
     })
-    this.getGoodsDetailAndKanjieInfo(this.data.goodsId)
+  },
+  getTopHeightFunction() {
+    var that = this
+    var tabs = that.data.tabs
+    tabs.forEach((element, index) => {
+      var viewId = "#" + element.view_id
+      that.getTopHeight(viewId, index)
+    });
+  },
+  getTopHeight(viewId, index) {
+    var query = wx.createSelectorQuery();
+    query.select(viewId).boundingClientRect((rect) => {
+      if (!rect) {
+        return
+      }
+      let top = rect.top
+      var tabs = this.data.tabs
+      tabs[index].topHeight = top
+      this.setData({
+        tabs: tabs
+      })
+    }).exec()
   },
   async goodsFavCheck() {
     const res = await WXAPI.goodsFavCheck(wx.getStorageSync('token'), this.data.goodsId)
@@ -93,11 +187,8 @@ Page({
       })
     }
   },
-  async addFav(){
+  async addFav() {
     AUTH.checkHasLogined().then(isLogined => {
-      this.setData({
-        wxlogin: isLogined
-      })
       if (isLogined) {
         if (this.data.faved) {
           // 取消收藏
@@ -119,6 +210,11 @@ Page({
     const goodsDetailRes = await WXAPI.goodsDetail(goodsId, token ? token : '')
     const goodsKanjiaSetRes = await WXAPI.kanjiaSet(goodsId)
     if (goodsDetailRes.code == 0) {
+      if (!goodsDetailRes.data.pics || goodsDetailRes.data.pics.length == 0) {
+        goodsDetailRes.data.pics = [{
+          pic: goodsDetailRes.data.basicInfo.pic
+        }]
+      }
       if (goodsDetailRes.data.properties) {
         that.setData({
           hasMoreSelect: true,
@@ -160,6 +256,13 @@ Page({
         if (myHelpDetail.code == 0) {
           _data.myHelpDetail = myHelpDetail.data
         }
+        //砍价商品 tabs栏显示砍价情况
+        var tabs = that.data.tabs
+        tabs[2].tabs_name="砍价记录"
+        tabs[2].view_id="kanjia"
+        that.setData({
+          tabs:tabs
+        })
       }
       if (goodsDetailRes.data.basicInfo.pingtuan) {
         const pingtuanSetRes = await WXAPI.pingtuanSet(goodsId)
@@ -167,13 +270,13 @@ Page({
           _data.pingtuanSet = pingtuanSetRes.data
           // 如果是拼团商品， 默认显示拼团价格
           _data.selectSizePrice = goodsDetailRes.data.basicInfo.pingtuanPrice
-        }        
+        }
       }
       that.setData(_data)
-      this.initShareQuanziProduct()
+      that.initShareQuanziProduct()
     }
   },
-  async shopSubdetail(shopId){
+  async shopSubdetail(shopId) {
     const res = await WXAPI.shopSubdetail(shopId)
     if (res.code == 0) {
       this.setData({
@@ -181,24 +284,24 @@ Page({
       })
     }
   },
-  goShopCar: function() {
+  goShopCar: function () {
     wx.reLaunch({
       url: "/pages/shop-cart/index"
     });
   },
-  toAddShopCar: function() {
+  toAddShopCar: function () {
     this.setData({
       shopType: "addShopCar"
     })
     this.bindGuiGeTap();
   },
-  tobuy: function() {
+  tobuy: function () {
     this.setData({
       shopType: "tobuy"
     });
     this.bindGuiGeTap();
   },
-  toPingtuan: function(e) {
+  toPingtuan: function (e) {
     let pingtuanopenid = 0
     if (e.currentTarget.dataset.pingtuanopenid) {
       pingtuanopenid = e.currentTarget.dataset.pingtuanopenid
@@ -208,16 +311,16 @@ Page({
       selectSizePrice: this.data.goodsDetail.basicInfo.pingtuanPrice,
       selectSizeOPrice: this.data.goodsDetail.basicInfo.originalPrice,
       pingtuanopenid: pingtuanopenid,
-      
+
       hideShopPopup: false,
       skuGoodsPic: this.data.goodsDetail.basicInfo.pic
     });
-    
+
   },
   /**
    * 规格选择弹出框
    */
-  bindGuiGeTap: function() {
+  bindGuiGeTap: function () {
     this.setData({
       hideShopPopup: false,
       selectSizePrice: this.data.goodsDetail.basicInfo.minPrice,
@@ -228,7 +331,7 @@ Page({
   /**
    * 规格选择弹出框隐藏
    */
-  closePopupTap: function() {
+  closePopupTap: function () {
     this.setData({
       hideShopPopup: true
     })
@@ -303,7 +406,12 @@ Page({
     }
     // 计算 sku 价格
     if (this.data.canSubmit) {
-      const res = await WXAPI.goodsPrice(this.data.goodsDetail.basicInfo.id, this.data.propertyChildIds)
+      const token = wx.getStorageSync('token')
+      const res = await WXAPI.goodsPriceV2({
+        token: token ? token : '',
+        goodsId: this.data.goodsDetail.basicInfo.id,
+        propertyChildIds: this.data.propertyChildIds
+      })
       if (res.code == 0) {
         price = res.data.price
         if (this.data.shopType == 'toPingtuan') {
@@ -319,7 +427,7 @@ Page({
       this.data.goodsAddition.forEach(big => {
         big.items.forEach(small => {
           if (small.active) {
-            price = (price*100 + small.price*100) / 100
+            price = (price * 100 + small.price * 100) / 100
           }
         })
       })
@@ -383,7 +491,9 @@ Page({
       let canSubmit = true
       this.data.goodsAddition.forEach(ele => {
         if (ele.required) {
-          const a = ele.items.find(item => {return item.active})
+          const a = ele.items.find(item => {
+            return item.active
+          })
           if (!a) {
             canSubmit = false
           }
@@ -415,9 +525,6 @@ Page({
     }
     const isLogined = await AUTH.checkHasLogined()
     if (!isLogined) {
-      this.setData({
-        wxlogin: false
-      })
       return
     }
     const token = wx.getStorageSync('token')
@@ -450,7 +557,7 @@ Page({
   /**
    * 立即购买
    */
-  buyNow: function(e) {
+  buyNow: function (e) {
     let that = this
     let shoptype = e.currentTarget.dataset.shoptype
     if (this.data.goodsDetail.properties && !this.data.canSubmit) {
@@ -465,7 +572,9 @@ Page({
       let canSubmit = true
       this.data.goodsAddition.forEach(ele => {
         if (ele.required) {
-          const a = ele.items.find(item => {return item.active})
+          const a = ele.items.find(item => {
+            return item.active
+          })
           if (!a) {
             canSubmit = false
           }
@@ -502,11 +611,8 @@ Page({
           url: "/pages/to-pay-order/index?orderType=buyNow&pingtuanOpenId=" + this.data.pingtuanopenid
         })
       } else {
-        WXAPI.pingtuanOpen(wx.getStorageSync('token'), that.data.goodsDetail.basicInfo.id).then(function(res) {
+        WXAPI.pingtuanOpen(wx.getStorageSync('token'), that.data.goodsDetail.basicInfo.id).then(function (res) {
           if (res.code == 2000) {
-            that.setData({
-              wxlogin: false
-            })
             return
           }
           if (res.code != 0) {
@@ -532,7 +638,7 @@ Page({
   /**
    * 组建立即购买信息
    */
-  buliduBuyNowInfo: function(shoptype) {
+  buliduBuyNowInfo: function (shoptype) {
     var shopCarMap = {};
     shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
     shopCarMap.shopId = this.data.goodsDetail.basicInfo.shopId;
@@ -588,17 +694,17 @@ Page({
         serviceDistance: 99999999,
       }
     }
-    
+
     return buyNowInfo;
   },
   onShareAppMessage() {
     let _data = {
       title: this.data.goodsDetail.basicInfo.name,
       path: '/pages/goods-details/index?id=' + this.data.goodsDetail.basicInfo.id + '&inviter_id=' + wx.getStorageSync('uid'),
-      success: function(res) {
+      success: function (res) {
         // 转发成功
       },
-      fail: function(res) {
+      fail: function (res) {
         // 转发失败
       }
     }
@@ -608,13 +714,13 @@ Page({
     }
     return _data
   },
-  reputation: function(goodsId) {
+  reputation: function (goodsId) {
     var that = this;
-    WXAPI.goodsReputation({
+    WXAPI.goodsReputationV2({
       goodsId: goodsId
-    }).then(function(res) {
+    }).then(function (res) {
       if (res.code == 0) {
-        res.data.forEach(ele => {
+        res.data.result.forEach(ele => {
           if (ele.goods.goodReputation == 0) {
             ele.goods.goodReputation = 1
           } else if (ele.goods.goodReputation == 1) {
@@ -629,12 +735,12 @@ Page({
       }
     })
   },
-  pingtuanList: function(goodsId) {
+  pingtuanList: function (goodsId) {
     var that = this;
     WXAPI.pingtuanList({
       goodsId: goodsId,
       status: 0
-    }).then(function(res) {
+    }).then(function (res) {
       if (res.code == 0) {
         that.setData({
           pingtuanList: res.data.result
@@ -642,9 +748,9 @@ Page({
       }
     })
   },
-  getVideoSrc: function(videoId) {
+  getVideoSrc: function (videoId) {
     var that = this;
-    WXAPI.videoDetail(videoId).then(function(res) {
+    WXAPI.videoDetail(videoId).then(function (res) {
       if (res.code == 0) {
         that.setData({
           videoMp4Src: res.data.fdMp4
@@ -652,18 +758,14 @@ Page({
       }
     })
   },
-  joinKanjia(){
+  joinKanjia() {
     AUTH.checkHasLogined().then(isLogined => {
       if (isLogined) {
         this.doneJoinKanjia();
-      } else {
-        this.setData({
-          wxlogin: false
-        })
       }
     })
   },
-  doneJoinKanjia: function() { // 报名参加砍价活动
+  doneJoinKanjia: function () { // 报名参加砍价活动
     const _this = this;
     if (!_this.data.curGoodsKanjia) {
       return;
@@ -672,7 +774,7 @@ Page({
       title: '加载中',
       mask: true
     })
-    WXAPI.kanjiaJoin(wx.getStorageSync('token'), _this.data.curGoodsKanjia.id).then(function(res) {
+    WXAPI.kanjiaJoin(wx.getStorageSync('token'), _this.data.curGoodsKanjia.id).then(function (res) {
       wx.hideLoading()
       if (res.code == 0) {
         _this.setData({
@@ -688,7 +790,7 @@ Page({
       }
     })
   },
-  joinPingtuan: function(e) {
+  joinPingtuan: function (e) {
     let pingtuanopenid = e.currentTarget.dataset.pingtuanopenid
     wx.navigateTo({
       url: "/pages/to-pay-order/index?orderType=buyNow&pingtuanOpenId=" + pingtuanopenid
@@ -702,15 +804,12 @@ Page({
   helpKanjia() {
     const _this = this;
     AUTH.checkHasLogined().then(isLogined => {
-      _this.setData({
-        wxlogin: isLogined
-      })
       if (isLogined) {
         _this.helpKanjiaDone()
       }
     })
   },
-  helpKanjiaDone(){
+  helpKanjiaDone() {
     const _this = this;
     WXAPI.kanjiaHelp(wx.getStorageSync('token'), _this.data.kjId, _this.data.kjJoinUid, '').then(function (res) {
       if (res.code != 0) {
@@ -731,22 +830,7 @@ Page({
       _this.getGoodsDetailAndKanjieInfo(_this.data.goodsDetail.basicInfo.id)
     })
   },
-  cancelLogin() {
-    this.setData({
-      wxlogin: true
-    })
-  },
-  processLogin(e) {
-    if (!e.detail.userInfo) {
-      wx.showToast({
-        title: '已取消',
-        icon: 'none',
-      })
-      return;
-    }
-    AUTH.register(this);
-  },
-  closePop(){
+  closePop() {
     this.setData({
       posterShow: false
     })
@@ -789,19 +873,16 @@ Page({
         height: picHeight + 660,
         backgroundColor: '#fff',
         debug: false,
-        blocks: [
-          {
-            x: 76,
-            y: 74,
-            width: 604,
-            height: picHeight + 120,
-            borderWidth: 2,
-            borderColor: '#c2aa85',
-            borderRadius: 8
-          }
-        ],
-        images: [
-          {
+        blocks: [{
+          x: 76,
+          y: 74,
+          width: 604,
+          height: picHeight + 120,
+          borderWidth: 2,
+          borderColor: '#c2aa85',
+          borderRadius: 8
+        }],
+        images: [{
             x: 133,
             y: 133,
             url: _this.data.goodsDetail.basicInfo.pic, // 商品图片
@@ -816,12 +897,11 @@ Page({
             height: 222
           }
         ],
-        texts: [
-          {
+        texts: [{
             x: 375,
             y: _baseHeight + 80,
             width: 650,
-            lineNum:2,
+            lineNum: 2,
             text: _this.data.goodsDetail.basicInfo.name,
             textAlign: 'center',
             fontSize: 40,
@@ -889,10 +969,10 @@ Page({
       shareQuanziProduct: {
         "item_code": this.data.goodsDetail.basicInfo.id + '',
         "title": this.data.goodsDetail.basicInfo.name,
-        "category_list":[
+        "category_list": [
           this.data.goodsDetail.category.name
         ],
-        "image_list":[
+        "image_list": [
           this.data.goodsDetail.basicInfo.pic
         ],
         "src_mini_program_path": '/pages/goods-details/index?id=' + this.data.goodsDetail.basicInfo.id
@@ -912,5 +992,17 @@ Page({
       current: url, // 当前显示图片的http链接
       urls: [url] // 需要预览的图片http链接列表
     })
-  }
+  },
+  onTabsChange(e) {
+    var index = e.detail.index
+    this.setData({
+      toView: this.data.tabs[index].view_id
+    })
+  },
+  backToHome() {
+    wx.switchTab({
+      url: '/pages/index/index',
+    })
+  },
 })
+

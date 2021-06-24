@@ -1,4 +1,5 @@
 @import 'weui/weui.wxss';
+@import "/miniprogram_npm/@vant/weapp/common/index.wxss";
 
 .container {
   display: flex;
@@ -77,4 +78,9 @@ page {
   bottom: calc(env(safe-area-inset-bottom) / 2);
   left: 0;
   width: 100vw;
+}
+.characteristic {
+  padding: 0 24rpx;
+  font-size: 24rpx;
+  color: #999;
 }
