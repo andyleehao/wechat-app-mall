@@ -33,7 +33,7 @@ Page({
   },
 
   tabClick: function(e) {
-    wx.setStorageSync("_categoryId", e.currentTarget.id)
+    wx.setStorageSync("_categoryId", e.currentTarget.dataset.id)
     wx.switchTab({
       url: '/pages/category/category',
     })
@@ -286,7 +286,7 @@ Page({
     }
   },
   goCoupons: function (e) {
-    wx.navigateTo({
+    wx.switchTab({
       url: "/pages/coupons/index"
     })
   },
@@ -302,22 +302,15 @@ Page({
       }
     })
   },
-  bindinput(e) {
-    this.setData({
-      inputVal: e.detail.value
-    })
-  },
-  bindconfirm(e) {
-    this.setData({
-      inputVal: e.detail.value
-    })
-    wx.navigateTo({
-      url: '/pages/goods/list?name=' + this.data.inputVal,
-    })
-  },
   goSearch(){
     wx.navigateTo({
-      url: '/pages/goods/list?name=' + this.data.inputVal,
+      url: '/pages/search/index'
+    })
+  },
+  goNotice(e) {
+    const id = e.currentTarget.dataset.id
+    wx.navigateTo({
+      url: '/pages/notice/show?id=' + id,
     })
   }
 })

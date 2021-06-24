@@ -114,8 +114,9 @@ Page({
     })
   },
   async getGoodsDetailAndKanjieInfo(goodsId) {
+    const token = wx.getStorageSync('token')
     const that = this;
-    const goodsDetailRes = await WXAPI.goodsDetail(goodsId)
+    const goodsDetailRes = await WXAPI.goodsDetail(goodsId, token ? token : '')
     const goodsKanjiaSetRes = await WXAPI.kanjiaSet(goodsId)
     if (goodsDetailRes.code == 0) {
       if (goodsDetailRes.data.properties) {
@@ -534,6 +535,7 @@ Page({
   buliduBuyNowInfo: function(shoptype) {
     var shopCarMap = {};
     shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
+    shopCarMap.shopId = this.data.goodsDetail.basicInfo.shopId;
     shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
     shopCarMap.name = this.data.goodsDetail.basicInfo.name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
@@ -576,6 +578,17 @@ Page({
 
     buyNowInfo.shopList.push(shopCarMap);
     buyNowInfo.kjId = this.data.kjId;
+    if (this.data.shopSubdetail) {
+      buyNowInfo.shopInfo = this.data.shopSubdetail.info
+    } else {
+      buyNowInfo.shopInfo = {
+        id: 0,
+        name: "其他",
+        pic: null,
+        serviceDistance: 99999999,
+      }
+    }
+    
     return buyNowInfo;
   },
   onShareAppMessage() {
@@ -601,6 +614,15 @@ Page({
       goodsId: goodsId
     }).then(function(res) {
       if (res.code == 0) {
+        res.data.forEach(ele => {
+          if (ele.goods.goodReputation == 0) {
+            ele.goods.goodReputation = 1
+          } else if (ele.goods.goodReputation == 1) {
+            ele.goods.goodReputation = 3
+          } else if (ele.goods.goodReputation == 2) {
+            ele.goods.goodReputation = 5
+          }
+        })
         that.setData({
           reputation: res.data
         });
@@ -883,5 +905,12 @@ Page({
       icon: 'none'
     })
     console.error(e)
+  },
+  previewImage(e) {
+    const url = e.currentTarget.dataset.url
+    wx.previewImage({
+      current: url, // 当前显示图片的http链接
+      urls: [url] // 需要预览的图片http链接列表
+    })
   }
 })

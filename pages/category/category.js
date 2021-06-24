@@ -8,6 +8,7 @@ Page({
    */
   data: {
     categories: [],
+    activeCategory: 0,
     categorySelected: {
       name: '',
       id: ''
@@ -16,7 +17,9 @@ Page({
     onLoadStatus: true,
     scrolltop: 0,
 
-    skuCurGoods: undefined
+    skuCurGoods: undefined,
+    page: 1,
+    pageSize: 20
   },
   /**
    * 生命周期函数--监听页面加载
@@ -29,98 +32,117 @@ Page({
   },
   async categories() {
     wx.showLoading({
-      title: '加载中',
+      title: '',
     })
     const res = await WXAPI.goodsCategory()
     wx.hideLoading()
-    let categories = [];
-    let categoryName = '';
-    let categoryId = '';
+    let activeCategory = 0
+    let categorySelected = this.data.categorySelected
     if (res.code == 0) {
       if (this.data.categorySelected.id) {
-        const _curCategory = res.data.find(ele => {
+        activeCategory = res.data.findIndex(ele => {
           return ele.id == this.data.categorySelected.id
         })
-        categoryName = _curCategory.name;
-        categoryId = _curCategory.id;
+        categorySelected = res.data[activeCategory]
+      } else {
+        categorySelected = res.data[0]
       }
-      for (let i = 0; i < res.data.length; i++) {
-        let item = res.data[i];
-        categories.push(item);
-        if (i == 0 && !this.data.categorySelected.id) {
-          categoryName = item.name;
-          categoryId = item.id;
-        }
-      }
+      const categories = res.data
+      categories.forEach(p => {
+        p.childs = categories.filter(ele => {
+          return p.id == ele.pid
+        })
+        console.log(p.childs);
+      })
+      this.setData({
+        page: 1,
+        activeCategory,
+        categories,
+        categorySelected
+      })
+      this.getGoodsList()
     }
-    this.setData({
-      categories: categories,
-      categorySelected: {
-        name: categoryName,
-        id: categoryId
-      }
-    });
-    this.getGoodsList();
   },
   async getGoodsList() {
     wx.showLoading({
-      title: '加载中',
+      title: '',
     })
+    // secondCategoryId
+    let categoryId = ''
+    if (this.data.secondCategoryId) {
+      categoryId = this.data.secondCategoryId
+    } else if(this.data.categorySelected.id) {
+      categoryId = this.data.categorySelected.id
+    }
     const res = await WXAPI.goods({
-      categoryId: this.data.categorySelected.id,
-      page: 1,
-      pageSize: 100000
+      categoryId,
+      page: this.data.page,
+      pageSize: this.data.pageSize
     })
     wx.hideLoading()
     if (res.code == 700) {
+      if (this.data.page == 1) {
+        this.setData({
+          currentGoods: null
+        });
+      } else {
+        wx.showToast({
+          title: '没有更多了',
+          icon: 'none'
+        })
+      }
+      return
+    }
+    if (res.code != 0) {
+      wx.showToast({
+        title: res.msg,
+        icon: 'none'
+      })
+      return
+    }
+    if (this.data.page == 1) {
       this.setData({
-        currentGoods: null
-      });
+        currentGoods: res.data
+      })
+    } else {
+      this.setData({
+        currentGoods: this.data.currentGoods.concat(res.data)
+      })
+    }
+  },
+  onCategoryClick(e) {
+    const idx = e.target.dataset.idx
+    if (idx == this.data.activeCategory) {
+      this.setData({
+        scrolltop: 0,
+      })
       return
     }
     this.setData({
-      currentGoods: res.data
+      page: 1,
+      secondCategoryId: '',
+      activeCategory: idx,
+      categorySelected: this.data.categories[idx],
+      scrolltop: 0
     });
+    this.getGoodsList();
   },
-  toDetailsTap: function(e) {
-    wx.navigateTo({
-      url: "/pages/goods-details/index?id=" + e.currentTarget.dataset.id
-    })
-  },
-  onCategoryClick: function(e) {
-    var that = this;
-    var id = e.target.dataset.id;
-    if (id === that.data.categorySelected.id) {
-      that.setData({
-        scrolltop: 0,
-      })
-    } else {
-      var categoryName = '';
-      for (var i = 0; i < that.data.categories.length; i++) {
-        let item = that.data.categories[i];
-        if (item.id == id) {
-          categoryName = item.name;
-          break;
-        }
-      }
-      that.setData({
-        categorySelected: {
-          name: categoryName,
-          id: id
-        },
-        scrolltop: 0
-      });
-      that.getGoodsList();
+  onSecondCategoryClick(e) {
+    const idx = e.detail.index
+    let secondCategoryId = ''
+    if (idx) {
+      // 点击了具体的分类
+      secondCategoryId = this.data.categorySelected.childs[idx-1].id
     }
-  },
-  bindinput(e) {
     this.setData({
-      inputVal: e.detail.value
-    })
+      page: 1,
+      secondCategoryId
+    });
+    this.getGoodsList();
   },
   bindconfirm(e) {
     this.setData({
-      inputVal: e.detail.value
+      inputVal: e.detail
     })
     wx.navigateTo({
       url: '/pages/goods/list?name=' + this.data.inputVal,
@@ -361,5 +383,9 @@ Page({
       return;
     }
     AUTH.register(this);
+  },
+  goodsGoBottom() {
+    this.data.page++
+    this.getGoodsList()
   },
 })

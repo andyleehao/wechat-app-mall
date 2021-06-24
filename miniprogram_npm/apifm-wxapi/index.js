@@ -92,11 +92,10 @@ module.exports =
 "use strict";
 
 
-var _module$exports;
-
 /* eslint-disable */
 // 小程序开发api接口工具包，https://github.com/gooking/wxapi
 var API_BASE_URL = 'https://api.it120.cc';
+// var API_BASE_URL = 'http://127.0.0.1:8081';
 var subDomain = '-';
 
 var request = function request(url, needSubDomain, method, data) {
@@ -146,7 +145,7 @@ var request = function request(url, needSubDomain, method, data) {
 //   );
 // }
 
-module.exports = (_module$exports = {
+module.exports = {
   init2: function init2(a, b) {
     API_BASE_URL = a;
     subDomain = b;
@@ -289,6 +288,15 @@ module.exports = (_module$exports = {
   wxpay: function wxpay(data) {
     return request('/pay/wx/wxapp', true, 'post', data);
   },
+  wxpayFOMO: function wxpayFOMO(data) {
+    return request('/pay/fomo/wxapp', true, 'post', data);
+  },
+  payNow: function payNow(data) {
+    return request('/pay/fomo/payNow', true, 'post', data);
+  },
+  fomoCheckout: function fomoCheckout(data) {
+    return request('/pay/fomo/checkout', true, 'post', data);
+  },
   wxpayFWS: function wxpayFWS(data) {
     return request('/pay/wxfws/wxapp', true, 'post', data);
   },
@@ -338,6 +346,9 @@ module.exports = (_module$exports = {
       mobile: mobile, pwd: pwd, deviceId: deviceId, deviceName: deviceName
     });
   },
+  loginMobileSmsCode: function loginMobileSmsCode(data) {
+    return request('/user/m/loginMobile', true, 'post', data);
+  },
   resetPwdUseMobileCode: function resetPwdUseMobileCode(mobile, pwd, code) {
     return request('/user/m/reset-pwd', true, 'post', {
       mobile: mobile, pwd: pwd, code: code
@@ -373,11 +384,20 @@ module.exports = (_module$exports = {
     return request('/shop/goods/category/info', true, 'get', { id: id });
   },
   goods: function goods(data) {
+    if (!data) {
+      data = {};
+    }
+    var shopIds = wx.getStorageSync('shopIds');
+    if (shopIds) {
+      data.shopId = shopIds;
+    }
     return request('/shop/goods/list', true, 'post', data);
   },
   goodsDetail: function goodsDetail(id) {
+    var token = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
     return request('/shop/goods/detail', true, 'get', {
-      id: id
+      id: id, token: token
     });
   },
   goodsLimitations: function goodsLimitations(goodsId) {
@@ -477,8 +497,10 @@ module.exports = (_module$exports = {
     return request('/discounts/send', true, 'post', data);
   },
   exchangeCoupons: function exchangeCoupons(token, number, pwd) {
+    var extJsonStr = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+
     return request('/discounts/exchange', true, 'post', {
-      token: token, number: number, pwd: pwd
+      token: token, number: number, pwd: pwd, extJsonStr: extJsonStr
     });
   },
   noticeList: function noticeList(data) {
@@ -696,6 +718,9 @@ module.exports = (_module$exports = {
       token: token
     });
   },
+  withDrawApplyV2: function withDrawApplyV2(data) {
+    return request('/user/withDraw/apply', true, 'post', data);
+  },
   withDrawDetail: function withDrawDetail(token, id) {
     return request('/user/withDraw/detail', true, 'get', {
       token: token,
@@ -729,13 +754,24 @@ module.exports = (_module$exports = {
     return request('/payBill/discounts', true, 'get');
   },
   payBill: function payBill(token, money) {
-    return request('/payBill/pay', true, 'post', { token: token, money: money });
+    var pwd = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+    return request('/payBill/pay', true, 'post', { token: token, money: money, pwd: pwd });
+  },
+  payBillV2: function payBillV2(data) {
+    return request('/payBill/pay', true, 'post', data);
   },
   vipLevel: function vipLevel() {
     return request('/config/vipLevel', true, 'get');
   },
+  fxSetting: function fxSetting() {
+    return request('/saleDistribution/setting', true, 'get');
+  },
   fxApply: function fxApply(token, name, mobile) {
     return request('/saleDistribution/apply', true, 'post', { token: token, name: name, mobile: mobile });
+  },
+  fxBuy: function fxBuy(token) {
+    return request('/saleDistribution/buy', true, 'post', { token: token });
   },
   fxApplyProgress: function fxApplyProgress(token) {
     return request('/saleDistribution/apply/progress', true, 'get', { token: token });
@@ -967,6 +1003,9 @@ module.exports = (_module$exports = {
 
     return request('/verification/sms/get', true, 'get', { mobile: mobile, key: key, picCode: picCode });
   },
+  smsValidateCodeByToken: function smsValidateCodeByToken(token) {
+    return request('/verification/sms/get-by-token', true, 'get', { token: token });
+  },
   smsValidateCodeCheck: function smsValidateCodeCheck(mobile, code) {
     return request('/verification/sms/check', true, 'post', { mobile: mobile, code: code });
   },
@@ -978,6 +1017,9 @@ module.exports = (_module$exports = {
   },
   mapDistance: function mapDistance(lat1, lng1, lat2, lng2) {
     return request('/common/map/distance', false, 'get', { lat1: lat1, lng1: lng1, lat2: lat2, lng2: lng2 });
+  },
+  mapDistanceNavigation: function mapDistanceNavigation(key, mode, from, to) {
+    return request('/common/map/qq/distance', false, 'post', { key: key, mode: mode, from: from, to: to });
   },
   mapQQAddress: function mapQQAddress() {
     var location = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -1188,6 +1230,11 @@ module.exports = (_module$exports = {
       token: token, key: key
     });
   },
+  shippingCartSelected: function shippingCartSelected(token, key, selected) {
+    return request('/shopping-cart/select', true, 'post', {
+      token: token, key: key, selected: selected
+    });
+  },
   shippingCarInfoRemoveAll: function shippingCarInfoRemoveAll(token) {
     return request('/shopping-cart/empty', true, 'post', {
       token: token
@@ -1208,6 +1255,9 @@ module.exports = (_module$exports = {
     return request('/wx/live/his', true, 'get', {
       roomId: roomId
     });
+  },
+  peisonFeeList: function peisonFeeList() {
+    return request('/fee/peisong/list', true, 'get');
   },
   peisongMembers: function peisongMembers(data) {
     return request('/peisong/member/list', true, 'post', data);
@@ -1292,71 +1342,100 @@ module.exports = (_module$exports = {
     return request('/user/tt/microapp/login', true, 'post', {
       code: code
     });
+  },
+  wxOpenAuthorization: function wxOpenAuthorization(data) {
+    return request('/user/wxsns/authorization', true, 'post', data);
+  },
+  userAttentioncheck: function userAttentioncheck(token, uid) {
+    return request('/user/attention/check', true, 'get', {
+      token: token, uid: uid
+    });
+  },
+  userAttentionAdd: function userAttentionAdd(token, uid) {
+    return request('/user/attention/add', true, 'post', {
+      token: token, uid: uid
+    });
+  },
+  userAttentionRemove: function userAttentionRemove(token, uid) {
+    return request('/user/attention/remove', true, 'post', {
+      token: token, uid: uid
+    });
+  },
+  userAttentionMeList: function userAttentionMeList(data) {
+    return request('/user/attention/attention-me', true, 'post', data);
+  },
+  userMyAttentionList: function userMyAttentionList(data) {
+    return request('/user/attention/my-attention', true, 'post', data);
+  },
+  userAttentionDetail: function userAttentionDetail(token, uid) {
+    return request('/user/attention/detail', true, 'get', {
+      token: token, uid: uid
+    });
+  },
+  userAttentionStatistics: function userAttentionStatistics(token) {
+    return request('/user/attention/statistics', true, 'get', {
+      token: token
+    });
+  },
+  cyTableToken: function cyTableToken(tableId, key) {
+    return request('/cyTable/token', true, 'post', {
+      id: tableId,
+      k: key
+    });
+  },
+  cyTableAddOrder: function cyTableAddOrder(data) {
+    return request('/cyTable/add-order', true, 'post', data);
+  },
+  cyTablePayOrder: function cyTablePayOrder(data) {
+    return request('/cyTable/pay-order', true, 'post', data);
+  },
+  goodsTimesDays: function goodsTimesDays(goodsId) {
+    var propertyChildIds = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+
+    return request('/shop/goods/times/days', true, 'post', { goodsId: goodsId, propertyChildIds: propertyChildIds });
+  },
+  goodsTimesDayItems: function goodsTimesDayItems(day, goodsId) {
+    var propertyChildIds = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+
+    return request('/shop/goods/times/items', true, 'post', { day: day, goodsId: goodsId, propertyChildIds: propertyChildIds });
+  },
+  wxappServiceLogin: function wxappServiceLogin(data) {
+    return request('/user/wxappService/login', true, 'post', data);
+  },
+  wxappServiceLoginWxaMobile: function wxappServiceLoginWxaMobile(data) {
+    return request('/user/wxappService/login/mobile', true, 'post', data);
+  },
+  wxappServiceRegisterComplex: function wxappServiceRegisterComplex(data) {
+    return request('/user/wxappService/register/complex', true, 'post', data);
+  },
+  wxappServiceRegisterSimple: function wxappServiceRegisterSimple(data) {
+    return request('/user/wxappService/register/simple', true, 'post', data);
+  },
+  wxappServiceAuthorize: function wxappServiceAuthorize(data) {
+    return request('/user/wxappService/authorize', true, 'post', data);
+  },
+  wxappServiceBindMobile: function wxappServiceBindMobile(data) {
+    return request('/user/wxappService/bindMobile', true, 'post', data);
+  },
+  wxappServiceBindOpenid: function wxappServiceBindOpenid(data) {
+    return request('/user/wxappService/bindOpenid', true, 'post', data);
+  },
+  wxappServiceEncryptedData: function wxappServiceEncryptedData(data) {
+    return request('/user/wxappService/decode/encryptedData', true, 'post', data);
+  },
+  trtcUserSig: function trtcUserSig(token) {
+    return request('/trtc/userSig', true, 'get', { token: token });
+  },
+  setPayPassword: function setPayPassword(token, pwd) {
+    return request('/user/paypwd/set', true, 'post', { token: token, pwd: pwd });
+  },
+  modifyPayPassword: function modifyPayPassword(token, pwdOld, pwdNew) {
+    return request('/user/paypwd/modify', true, 'post', { token: token, pwdOld: pwdOld, pwdNew: pwdNew });
+  },
+  resetPayPassword: function resetPayPassword(mobile, code, pwd) {
+    return request('/user/paypwd/reset', true, 'post', { mobile: mobile, code: code, pwd: pwd });
   }
-}, _module$exports['login_tt'] = function login_tt(code) {
-  return request('/user/tt/microapp/login', true, 'post', {
-    code: code
-  });
-}, _module$exports.wxOpenAuthorization = function wxOpenAuthorization(data) {
-  return request('/user/wxsns/authorization', true, 'post', data);
-}, _module$exports.userAttentioncheck = function userAttentioncheck(token, uid) {
-  return request('/user/attention/check', true, 'get', {
-    token: token, uid: uid
-  });
-}, _module$exports.userAttentionAdd = function userAttentionAdd(token, uid) {
-  return request('/user/attention/add', true, 'post', {
-    token: token, uid: uid
-  });
-}, _module$exports.userAttentionRemove = function userAttentionRemove(token, uid) {
-  return request('/user/attention/remove', true, 'post', {
-    token: token, uid: uid
-  });
-}, _module$exports.userAttentionMeList = function userAttentionMeList(data) {
-  return request('/user/attention/attention-me', true, 'post', data);
-}, _module$exports.userMyAttentionList = function userMyAttentionList(data) {
-  return request('/user/attention/my-attention', true, 'post', data);
-}, _module$exports.userAttentionDetail = function userAttentionDetail(token, uid) {
-  return request('/user/attention/detail', true, 'get', {
-    token: token, uid: uid
-  });
-}, _module$exports.userAttentionStatistics = function userAttentionStatistics(token) {
-  return request('/user/attention/statistics', true, 'get', {
-    token: token
-  });
-}, _module$exports.cyTableToken = function cyTableToken(tableId, key) {
-  return request('/cyTable/token', true, 'post', {
-    id: tableId,
-    k: key
-  });
-}, _module$exports.cyTableAddOrder = function cyTableAddOrder(data) {
-  return request('/cyTable/add-order', true, 'post', data);
-}, _module$exports.cyTablePayOrder = function cyTablePayOrder(data) {
-  return request('/cyTable/pay-order', true, 'post', data);
-}, _module$exports.goodsTimesDays = function goodsTimesDays(goodsId) {
-  var propertyChildIds = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
-  return request('/shop/goods/times/days', true, 'post', { goodsId: goodsId, propertyChildIds: propertyChildIds });
-}, _module$exports.goodsTimesDayItems = function goodsTimesDayItems(day, goodsId) {
-  var propertyChildIds = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-
-  return request('/shop/goods/times/items', true, 'post', { day: day, goodsId: goodsId, propertyChildIds: propertyChildIds });
-}, _module$exports.wxappServiceLogin = function wxappServiceLogin(data) {
-  return request('/user/wxappService/login', true, 'post', data);
-}, _module$exports.wxappServiceLoginWxaMobile = function wxappServiceLoginWxaMobile(data) {
-  return request('/user/wxappService/login/mobile', true, 'post', data);
-}, _module$exports.wxappServiceRegisterComplex = function wxappServiceRegisterComplex(data) {
-  return request('/user/wxappService/register/complex', true, 'post', data);
-}, _module$exports.wxappServiceRegisterSimple = function wxappServiceRegisterSimple(data) {
-  return request('/user/wxappService/register/simple', true, 'post', data);
-}, _module$exports.wxappServiceAuthorize = function wxappServiceAuthorize(data) {
-  return request('/user/wxappService/authorize', true, 'post', data);
-}, _module$exports.wxappServiceBindMobile = function wxappServiceBindMobile(data) {
-  return request('/user/wxappService/bindMobile', true, 'post', data);
-}, _module$exports.wxappServiceBindOpenid = function wxappServiceBindOpenid(data) {
-  return request('/user/wxappService/bindOpenid', true, 'post', data);
-}, _module$exports.wxappServiceEncryptedData = function wxappServiceEncryptedData(data) {
-  return request('/user/wxappService/decode/encryptedData', true, 'post', data);
-}, _module$exports);
+};
 
 /***/ })
 /******/ ]);

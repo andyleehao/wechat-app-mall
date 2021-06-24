@@ -57,7 +57,7 @@ Page({
       //购物车下单
       const res = await WXAPI.shippingCarInfo(token)
       if (res.code == 0) {
-        goodsList = res.data.items
+        goodsList = res.data.items.filter(ele => { return ele.selected })
       }
     }
     this.setData({
@@ -187,17 +187,30 @@ Page({
         })
         return;
       }
-      if(postData.peisongType == 'zq' && !this.data.mobile) {
-        wx.showToast({
-          title: '请填写手机号码',
-          icon: 'none'
-        })
-        return;
+      const extJsonStr = {}
+      if(postData.peisongType == 'zq') {
+        if(!this.data.name) {
+          wx.showToast({
+            title: '请填写联系人',
+            icon: 'none'
+          })
+          return;
+        }
+        if(!this.data.mobile) {
+          wx.showToast({
+            title: '请填写联系电话',
+            icon: 'none'
+          })
+          return;
+        }
+        extJsonStr['联系人'] = this.data.name
+        extJsonStr['联系电话'] = this.data.mobile
       }
       if(postData.peisongType == 'zq' && this.data.shops) {
         postData.shopIdZt = this.data.shops[this.data.shopIndex].id
         postData.shopNameZt = this.data.shops[this.data.shopIndex].name
       }
+      postData.extJsonStr = JSON.stringify(extJsonStr)
     }
 
     WXAPI.orderCreate(postData).then(function (res) {
@@ -214,7 +227,11 @@ Page({
 
       if (e && "buyNow" != that.data.orderType) {
         // 清空购物车数据
-        WXAPI.shippingCarInfoRemoveAll(loginToken)
+        const keyArrays = []
+        that.data.goodsList.forEach(ele => {
+          keyArrays.push(ele.key)
+        })
+        WXAPI.shippingCarInfoRemoveItem(loginToken, keyArrays.join())
       }
       if (!e) {
         let hasNoCoupons = true
@@ -255,7 +272,7 @@ Page({
     const balance = this.data.balance
     if (balance || res.data.amountReal*1 == 0) {
       // 有余额
-      const money = res.data.amountReal * 1 - balance*1
+      const money = (res.data.amountReal * 1 - balance*1).toFixed(2)
       if (money <= 0) {
         // 余额足够
         wx.showModal({
